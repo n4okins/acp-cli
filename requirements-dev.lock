@@ -22,6 +22,8 @@ idna==3.7
     # via requests
 iniconfig==2.0.0
     # via pytest
+lxml==5.2.1
+    # via acp
 packaging==24.0
     # via pytest
 pluggy==1.5.0

@@ -18,6 +18,8 @@ charset-normalizer==3.3.2
     # via requests
 idna==3.7
     # via requests
+lxml==5.2.1
+    # via acp
 pydantic==2.7.1
     # via acp
 pydantic-core==2.18.2
