@@ -14,5 +14,6 @@ tmp/
 .env
 .vscode/
 
+abc**/
 *.in
 *.out

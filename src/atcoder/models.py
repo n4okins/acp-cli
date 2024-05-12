@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from pydantic import BaseModel
 
 
@@ -9,6 +11,7 @@ class AtCoderProblem(BaseModel):
     title: str = ""
     name: str = ""
     is_interactive: bool = False
+    root_dir: Path = Path.cwd()
 
     def __str__(self) -> str:
         return f"<AtCoderProblem {self.contest.name.upper()}-{self.difficulty} '{self.title}' - {self.point} [pts] ({self.url})>"
@@ -25,7 +28,7 @@ class AtCoderContest(BaseModel):
 
     def __getattr__(self, attr: str) -> AtCoderProblem:
         return self.problems[attr]
-    
+
     def __getitem__(self, key: str) -> AtCoderProblem:
         return self.problems[key]
 
