@@ -34,3 +34,15 @@ class HttpStatusCode(Enum):
     SERVICE_UNAVAILABLE = 503
     GATEWAY_TIMEOUT = 504
     UNKNOWN = -1
+
+
+def color(r: int, g: int, b: int, style: int = 2) -> str:
+    return f"\033[38;{style};{r};{g};{b}m"
+
+
+def bg_color(r: int, g: int, b: int, style: int = 2) -> str:
+    return f"\033[48;{style};{r};{g};{b}m"
+
+
+def reset_color() -> str:
+    return "\033[0m"

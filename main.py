@@ -12,14 +12,10 @@ atcoder.login(
     username=env["ATCODER_USERNAME"],
     password=env["ATCODER_PASSWORD"],
 )
-
-print(atcoder.is_logged_in)
-print(atcoder.alerts)
-
-
-contest = atcoder.get_contest("https://atcoder.jp/contests/abc352")
-print(contest)
-# problem = atcoder.get_problem("https://atcoder.jp/contests/abc352/tasks/abc352_a")
+# contest = atcoder.get_contest("https://atcoder.jp/contests/abc352")
+problem = atcoder.get_problem("https://atcoder.jp/contests/abc352/tasks/abc352_a")
+atcoder.download_problem(problem)
+print(problem, problem.name)
 # print(contest)
 # print(contest.a)
-atcoder.download_contest(contest)
+atcoder.test(problem)

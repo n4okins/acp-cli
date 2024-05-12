@@ -1,8 +1,8 @@
+import os
 import re
 import time
 import weakref
 from abc import ABC, abstractmethod
-from functools import partial
 from logging import getLogger
 from pathlib import Path
 
@@ -11,9 +11,9 @@ import requests
 import requests.cookies
 from bs4 import BeautifulSoup
 
-from src.general.utils import HttpStatusCode
-
-from .models import AtCoderContest, AtCoderProblem
+from src.atcoder.judge import JudgeResult, JudgeRunner
+from src.atcoder.models import AtCoderContest, AtCoderProblem
+from src.general.utils import HttpStatusCode, bg_color, color, reset_color
 
 logger = getLogger(__name__)
 
@@ -252,3 +252,95 @@ class AtCoder(WebService):
     def download_contest(self, contest: AtCoderContest):
         for problem in contest.problems.values():
             self.download_problem(problem)
+
+    def test(
+        self,
+        problem: AtCoderProblem,
+        *,
+        target_dir: Path | str | None = None,
+        command: list[str] = ["python", "main.py"],
+    ):
+        target_dir = (
+            Path(target_dir)
+            if isinstance(target_dir, str)
+            else target_dir
+            or (Path.cwd() / problem.contest.name / problem.name.lower())
+        )
+
+        runner = JudgeRunner(command=command, cd=target_dir)
+        lines = []
+        lines.append(
+            bg_color(32, 32, 32)
+            + color(255, 255, 255)
+            + "-" * 16
+            + " "
+            + problem.name
+            + " "
+            + "-" * 16
+            + reset_color()
+        )
+        colormap = {
+            JudgeResult.AC: color(64, 255, 64),  # Green
+            JudgeResult.WA: color(255, 64, 64),  # Red
+            JudgeResult.RE: color(255, 255, 64),  # Yellow
+            JudgeResult.TLE: color(255, 192, 128),  # Orange
+            JudgeResult.IE: color(64, 255, 255),  # Cyan
+        }
+        for i in range(len(list((target_dir / "in").iterdir()))):
+            code, meta = runner(
+                target_dir / "in" / f"sample-{i}.in",
+                target_dir / "out" / f"sample-{i}.out",
+            )
+            line = (
+                bg_color(32, 32, 32)
+                + color(255, 255, 255)
+                + f" sample-{i} "
+                + reset_color()
+                + color(255, 255, 255)
+                + bg_color(32, 32, 32)
+                + "["
+                + colormap[code]
+                + f" {code.value} "
+                + reset_color()
+                + color(255, 255, 255)
+                + bg_color(32, 32, 32)
+                + "]"
+                + reset_color()
+            )
+            if code == JudgeResult.WA:
+                out = (target_dir / "out" / f"sample-{i}.out").read_text().strip()
+                line += (
+                    "\n"
+                    + bg_color(32, 64, 32)
+                    + color(255, 255, 255)
+                    + "\nExpected:\n"
+                    + out
+                    + reset_color()
+                    + bg_color(64, 32, 32)
+                    + color(255, 255, 255)
+                    + "\nGot:\n"
+                    + meta["stdout"].strip()
+                    + reset_color()
+                )
+            elif code == JudgeResult.RE:
+                err = meta["stderr"].strip()
+                line += f" return code: {meta['return_code']}" + (
+                    ("\n" + bg_color(64, 64, 32) + err + reset_color()) if err else ""
+                )
+            elif code == JudgeResult.TLE:
+                line += (
+                    bg_color(32, 32, 64)
+                    + f" time: {meta['time']:.2f} sec"
+                    + reset_color()
+                )
+            lines.append(line)
+        lines.append(
+            bg_color(32, 32, 32)
+            + color(255, 255, 255)
+            + "-" * (len(problem.name) + 34)
+            + reset_color()
+        )
+        lines[-1].strip()
+
+        for line in lines:
+            print(line)
