@@ -18,3 +18,5 @@ tmp/
 contests/
 *.in
 *.out
+
+main.py
