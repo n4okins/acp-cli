@@ -12,12 +12,13 @@ $ rye add acp --git=https://github.com/n4okins/acp.git
 
 # Usage
 
-### まず.envファイルを作成してください。
+### まず、AtCoderのユーザ名とパスワードを記載した.envファイルを作成してください。
 ```bash
 $ echo "ATCODER_USERNAME=<your_atcoder_username>" >> .env
 $ echo "ATCODER_PASSWORD=<your_atcoder_password>" >> .env
 ```
-```
+ディレクトリをgit管理している場合は`.gitignore`に`.env`を追加することを忘れないでください。
+```bash
 $ cat .env
 ATCODER_USERNAME=<UserName>
 ATCODER_PASSWORD=<Password>
@@ -29,7 +30,7 @@ ATCODER_PASSWORD=<Password>
 $ acp d <AtCoder Virtual Contest URL>
 ```
 ex:
-```
+```bash
 $ acp d https://kenkoooo.com/atcoder/#/contest/show/07cc74a1-098e-4c51-9ac5-6121276d3c11
 ```
 今回の例では「典型90問 難易度順」のコンテストをダウンロードします。以下のような出力が得られます。
@@ -37,6 +38,8 @@ $ acp d https://kenkoooo.com/atcoder/#/contest/show/07cc74a1-098e-4c51-9ac5-6121
 
 また、この際にカレントディレクトリ直下に`.acp`というディレクトリが作成されます。
 ここにはキャッシュや最後にダウンロードしたコンテストのデータが保存されます。
+
+`.env`同様、`.gitignore`に`.acp`を追加することを推奨します。
 
 ```
 ======================================== Virtual Contest: 典型90問 難易度順 ========================================
@@ -67,7 +70,8 @@ ex: 0番目の問題をテストする場合
 ```bash
 $ acp t 0
 Test <AtCoderProblem TYPICAL90- 'Cross Sum（★2）' - 0 [pts] (https://atcoder.jp/contests/typical90/tasks/typical90_d)> in '/path/to/典型90問 難易度順/00-typical90_d'? [y/N]: y
-
+```
+```
 ---------------- typical90_d ----------------
 - Execute Directory:  '/path/to/典型90問 難易度順/00-typical90_d'
 - Execute Command:    "python main.py"
@@ -150,7 +154,7 @@ Got:
 ex: C++などで作成した`./a.out`を実行する場合
 
 この場合は`/path/to/典型90問 難易度順/00-typical90_d/a.out`が実行されます。
-```
+```bash
 $ acp t 0 -c "./a.out"
 Test <AtCoderProblem TYPICAL90- 'Cross Sum（★2）' - 0 [pts] (https://atcoder.jp/contests/typical90/tasks/typical90_d)> in '/path/to/典型90問 難易度順/00-typical90_d'? [y/N]:y
 ---------------- typical90_d ----------------
@@ -172,7 +176,7 @@ $ acp s <problem_key>
 `<problem_key>`には問題のキーを指定してください。(testと同様です)
 また、言語はデフォルトでは`5055 Python(CPython 3.11.4)`が実行されます。AtCoderで指定されている言語IDを指定することで、その言語で提出することができます。
 
-```
+```bash
 $ acp s 0
 language_id: 5055 (Python (CPython 3.11.4))
 Submit '/path/to/典型90問 難易度順/00-typical90_d/main.py' to typical90_d? [y/N]: y
@@ -185,7 +189,7 @@ Submitted successfully. Please check the results. (https://atcoder.jp/contests/t
 提出結果はAtCoderの提出結果ページでも確認できます。
 
 使用できる言語は以下のコマンドで確認できます。
-```
+```bash
 $ acp langs
 ID: 5001 - C++ 20 (gcc 12.2)
 ID: 5002 - Go (go 1.20.6)
@@ -194,7 +198,7 @@ ID: 5090 - COBOL (GnuCOBOL(Fixed) 3.1.2)
 ```
 
 `grep`コマンドなどを組み合わせて、特定の言語のIDを取得することも可能です。
-```
+```bash
 $ acp langs | grep "Python"
 ID: 5055 - Python (CPython 3.11.4)
 ID: 5063 - Python (Mambaforge / CPython 3.10.10)
