@@ -267,20 +267,19 @@ class AtCoder(WebService):
         (target_dir / "out").mkdir(exist_ok=True, parents=True)
 
         self.get(problem.url)
-        self.wait(0.25)
+        self.wait(0.5)
 
         # Parse problem statement
         sample = re.compile(r"<h3>[入出]力例 \d+</h3><pre>([^<]+)[\n\r]</pre>").findall(
             str(self.soup)
         )
-        sample = [s.strip() for s in sample]
-        for i in range(0, len(sample), 2):
-            with (
-                (target_dir / "in" / f"sample-{i // 2}.in").open("w") as in_f,
-                (target_dir / "out" / f"sample-{i // 2}.out").open("w") as out_f,
-            ):
-                in_f.write(sample[i] + "\n")
-                out_f.write(sample[i + 1] + "\n")
+        for i, s in enumerate(sample):
+            if i % 2 == 0:
+                with (target_dir / "in" / f"sample-{i // 2}.in").open("w") as f:
+                    f.write(s)
+            else:
+                with (target_dir / "out" / f"sample-{i // 2}.out").open("w") as f:
+                    f.write(s)
 
     def download_contest(self, contest: AtCoderContest):
         for problem in contest.problems.values():
@@ -420,8 +419,9 @@ class AtCoder(WebService):
         }
         self.post(submit_url, data=data)
         self.wait(1)
+        submittion_result_url = problem.contest.url + "/submissions/me"
         for i in range(10):
-            self.get(problem.contest.url + "/submissions/me", use_cache=False)
+            self.get(submittion_result_url, use_cache=False)
             latest = BeautifulSoup(self.response.text, self.parser)
             judge = latest.find("span", class_="label").attrs["title"]  # type: ignore
             status = [
@@ -429,27 +429,10 @@ class AtCoder(WebService):
             ][:-1]
             print(judge, " | ".join(status))
             if judge not in ["ジャッジ待ち", "ジャッジ中"]:
+                print(
+                    f"Submitted successfully. Please check the results. ({submittion_result_url})"
+                )
                 break
             self.wait(5)
         else:
             print("Time out.")
-
-        # self.wait(1)
-        # for i in range(30):
-        #     latest = BeautifulSoup(
-        #         self.get_latest_submission_results(problem)["Html"],
-        #         self.parser,
-        #     )
-        #     judge = latest.find("span", class_="label").attrs["title"]
-        #     status = [td.text for td in latest.find_all("td")]
-        #     print(judge, status)
-        #     if judge not in ["ジャッジ待ち", "ジャッジ中"]:
-        #         break
-        #     self.wait(1)
-
-    # def get_latest_submission_results(self, problem: AtCoderProblem):
-    #     submit_results_url = problem.contest.url + "/submissions/me/status/json"
-    #     self.get(submit_results_url, use_cache=False)
-    #     data = json.loads(self.soup.text)
-    #     print(data)
-    #     return tuple(data["Result"].items())[-1][1]

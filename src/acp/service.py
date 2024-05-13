@@ -2,8 +2,6 @@ import json
 from logging import getLogger
 from pathlib import Path
 
-from bs4 import BeautifulSoup
-
 from src.acp.models import (
     AtCoderProblemsAPIResponse,
     AtCoderProblemsInnerProblem,
@@ -32,15 +30,15 @@ class AtCoderProblems(WebService):
     def __init__(self, parser: str = "lxml") -> None:
         super().__init__(parser)
 
-        self.problems_metadata = self.fetch_all_problems_metadata()
+        self.problems_metadata = {}
 
-    def login_atcoder(self) -> AtCoder:
+    def login_atcoder(self, root_dir: Path) -> AtCoder:
         atcoder_client = AtCoder()
         try:
-            env = load_env()
+            env = load_env(root_dir / ".env")
         except FileNotFoundError:
             raise self.AtCoderProblemsExceptions.LoginFailedError(
-                f"Please make .env file at {Path.cwd() / '.env'}"
+                f"Please make .env file at {root_dir / '.env'}"
             )
         username = env.get("USERNAME", env.get("ATCODER_USERNAME", None))
         password = env.get("PASSWORD", env.get("ATCODER_PASSWORD", None))
@@ -53,13 +51,15 @@ class AtCoderProblems(WebService):
         atcoder_client.login(username=username, password=password)
         return atcoder_client
 
-    def write_cache(self, cache_dir: Path, data: dict) -> None:
+    def write_cache(
+        self, cache_dir: Path, data: dict, filename: Path | str = "cache.json"
+    ) -> None:
         cache_dir.mkdir(parents=True, exist_ok=True)
-        if (cache_dir / "cache.json").exists():
+        if (cache_dir / filename).exists():
             prev = self.read_cache(cache_dir)
             prev.update(data)
             data = prev
-        with (cache_dir / "cache.json").open("w") as f:
+        with (cache_dir / filename).open("w") as f:
             json.dump(
                 data,
                 f,
@@ -67,24 +67,35 @@ class AtCoderProblems(WebService):
                 indent=4,
             )
 
-    def read_cache(self, cache_dir: Path) -> dict:
-        if (cache_dir / "cache.json").exists():
-            with (cache_dir / "cache.json").open("r") as f:
+    def read_cache(self, cache_dir: Path, filename: Path | str = "cache.json") -> dict:
+        if (cache_dir / filename).exists():
+            with (cache_dir / filename).open("r") as f:
                 return json.load(f)
         return {}
 
+    def guess_cache_dir(self, root_dir: Path = Path.cwd()) -> Path:
+        cache_path = root_dir / ".acp"
+        if not cache_path.exists():
+            for parent in root_dir.parents:
+                cache_path = parent / ".acp"
+                root_dir = parent
+                if cache_path.exists():
+                    break
+        return Path.cwd() / ".acp"
+
     def fetch_all_problems_metadata(self) -> dict[str, AtCoderProblemsMetadata]:
-        cache = self.read_cache(Path.cwd() / ".acp")
-        if "metadata" in cache:
-            return {x["id"]: AtCoderProblemsMetadata(**x) for x in cache["metadata"]}
         url = "https://kenkoooo.com/atcoder/resources/problems.json"
-        self.get(url)
-        metadata = {x["id"]: AtCoderProblemsMetadata(**x) for x in self.response.json()}
-        self.write_cache(
-            Path.cwd() / ".acp",
-            {"metadata": [x.model_dump() for x in metadata.values()]},
-        )
-        return metadata
+        cache_dir = self.guess_cache_dir()
+        cache = self.read_cache(cache_dir, "metadata.json")
+        if cache:
+            return {x["id"]: AtCoderProblemsMetadata(**x) for x in cache}
+        else:
+            self.get(url)
+            metadata = {
+                x["id"]: AtCoderProblemsMetadata(**x) for x in self.response.json()
+            }
+            self.write_cache(cache_dir, self.response.json(), "metadata.json")
+            return metadata
 
     def get_contest(self, url: str) -> AtCoderProblemsAPIResponse:
         if "#/contest/show/" not in url:
@@ -92,7 +103,7 @@ class AtCoderProblems(WebService):
                 f"Failed to find contest in {url}"
             )
         url = url.replace(
-            "#/contest/show", "/internal-api/contest/get"
+            "#/contest/show", "internal-api/contest/get"
         )  # APIのURLに変換
         self.get(url)
         data = self.response.json()
@@ -101,6 +112,7 @@ class AtCoderProblems(WebService):
 
         print("=" * 40 + f" Virtual Contest: {data.info.title} " + "=" * 40)
         max_name_length = max(len(problem.id) for problem in data.problems)
+        self.problems_metadata = self.fetch_all_problems_metadata()
         max_title_length = max(
             len(self.problems_metadata[problem.id].title) for problem in data.problems
         )
@@ -119,13 +131,15 @@ class AtCoderProblems(WebService):
         target_dir: Path | str | None = None,
     ) -> None:
         if target_dir is None:
-            target_dir = Path.cwd() / "contests" / contest_data.info.title
+            target_dir = (
+                self.guess_cache_dir().parent / "contests" / contest_data.info.title
+            )
         target_dir = Path(target_dir)
         print(f"Download problems in {target_dir}")
         if confirm_yn_input(
             "Do you want to download problems in this directory? [y/N]: "
         ):
-            atcoder = self.login_atcoder()
+            atcoder = self.login_atcoder(self.guess_cache_dir().parent)
             target_dir.mkdir(parents=True, exist_ok=True)
             problems = {}
             for i, problem in enumerate(contest_data.problems):
@@ -141,57 +155,40 @@ class AtCoderProblems(WebService):
                 print(f"Downloaded {metadata.id} to {problem_dir}")
                 self.wait(0.25)
 
+            root_dir = self.guess_cache_dir()
             self.write_cache(
-                Path.cwd() / ".acp",
+                root_dir,
                 {
                     "contest": contest_data.model_dump(),
-                    "target_dir": str(target_dir.relative_to(Path.cwd())),
+                    "target_dir": str(target_dir.relative_to(root_dir.parent)),
                 },
             )
             with open(target_dir / "info.json", "w") as f:
                 json.dump(problems, f, indent=2)
 
-    def test(
-        self,
-        name: str,
-        command: list[str] = ["python", "main.py"],
-        target_dir: Path | str | None = None,
-    ) -> None:
-        cache = self.read_cache(Path.cwd() / ".acp")
-        if not cache:
-            for parent in Path.cwd().parents:
-                cache = self.read_cache(parent / ".acp")
-                if cache:
-                    break
-
-        target_dir = target_dir or Path.cwd() / cache["target_dir"]
-        target_dir = Path(target_dir)
-        if not target_dir.exists():
-            raise self.AtCoderProblemsExceptions.ProblemsNotFoundError(
-                f"Failed to find problems in {target_dir}"
-            )
-        with (target_dir / "info.json").open("r") as f:
+    def guess_problem(self, key: str, info_file: Path) -> AtCoderProblem:
+        with info_file.open("r") as f:
             data = json.load(f)
-            if name.isdigit():
-                problem_data = list(data.values())[int(name)]
+            if key.isdigit():
+                problem_data = list(data.values())[int(key)]
             else:
-                problem_data = data.get(name, None)
+                problem_data = data.get(key, None)
                 if problem_data is None:
                     candidate = tuple(
                         filter(
-                            lambda x: (name in x["contest"]["url"])
-                            or (name in x["contest"]["name"])
-                            or (name in x["name"])
-                            or (name in x["root_dir"])
-                            or (name in x["title"])
-                            or (name in x["url"]),
+                            lambda x: (key in x["contest"]["url"])
+                            or (key in x["contest"]["name"])
+                            or (key in x["name"])
+                            or (key in x["root_dir"])
+                            or (key in x["title"])
+                            or (key in x["url"]),
                             data.values(),
                         )
                     )
                     if len(candidate) == 1:
                         problem_data = candidate[0]
                     elif len(candidate) > 1:
-                        msg = f"\nAmbiguous problem name: {name}\n\n"
+                        msg = f"\nAmbiguous problem name: {key}\n\n"
                         for i, problem in enumerate(candidate):
                             msg += f"{i:02d} | {problem['name']} - {problem['contest']['url']}\n"
 
@@ -199,18 +196,88 @@ class AtCoderProblems(WebService):
                         raise self.AtCoderProblemsExceptions.AmbiguousProblemError(msg)
                     else:
                         raise self.AtCoderProblemsExceptions.ProblemsNotFoundError(
-                            f"Failed to find {name} in {target_dir}"
+                            f"Failed to find {key} in {info_file}"
                         )
 
-            target_problem = AtCoderProblem(**problem_data)
-            if confirm_yn_input(
-                f"Test {target_problem} in '{target_dir / target_problem.root_dir}'? [y/N]:"
-            ):
-                AtCoder().test(
-                    target_problem,
-                    target_dir=target_dir / target_problem.root_dir,
-                    command=command,
-                )
-            else:
-                print("Abort testing.")
-                return
+            return AtCoderProblem(**problem_data)
+
+    def test(
+        self,
+        name: str,
+        command: list[str] = ["python", "main.py"],
+        target_dir: Path | str | None = None,
+    ) -> None:
+        cache_path = self.guess_cache_dir()
+        root_dir = cache_path.parent
+        cache = self.read_cache(cache_path)
+        target_dir = target_dir or root_dir / cache["target_dir"]
+        target_dir = Path(target_dir)
+        if not target_dir.exists():
+            raise self.AtCoderProblemsExceptions.ProblemsNotFoundError(
+                f"Failed to find problems in {target_dir}"
+            )
+
+        info_file = target_dir / "info.json"
+        if not info_file.exists():
+            raise self.AtCoderProblemsExceptions.ProblemsNotFoundError(
+                f"Failed to find problems in {target_dir}"
+            )
+        target_problem = self.guess_problem(name, info_file)
+        if confirm_yn_input(
+            f"Test {target_problem} in '{target_dir / target_problem.root_dir}'? [y/N]:"
+        ):
+            AtCoder().test(
+                target_problem,
+                target_dir=target_dir / target_problem.root_dir,
+                command=command,
+            )
+        else:
+            print("Abort testing.")
+            return
+
+    def submit(
+        self,
+        name: str,
+        *,
+        submit_file: Path | str = "main.py",
+        language_id: int = 5055,  # Python (CPython 3.11.4)
+        target_dir: Path | str | None = None,
+    ) -> None:
+        root_dir = Path.cwd()
+        cache_path = root_dir / ".acp"
+        if not cache_path.exists():
+            for parent in root_dir.parents:
+                cache_path = parent / ".acp"
+                root_dir = parent
+                if cache_path.exists():
+                    break
+
+        cache = self.read_cache(cache_path)
+        target_dir = target_dir or root_dir / cache["target_dir"]
+        target_dir = Path(target_dir)
+        if not target_dir.exists():
+            raise self.AtCoderProblemsExceptions.ProblemsNotFoundError(
+                f"Failed to find problems in {target_dir}"
+            )
+
+        info_file = target_dir / "info.json"
+        if not info_file.exists():
+            raise self.AtCoderProblemsExceptions.ProblemsNotFoundError(
+                f"Failed to find problems in {target_dir}"
+            )
+        target_problem = self.guess_problem(name, info_file)
+        submit_file = target_dir / target_problem.root_dir / submit_file
+        print(
+            f"language_id: {language_id} ({AtCoder._cache['lang'].get(language_id, 'Unknown')})"
+        )
+        if confirm_yn_input(
+            f"Submit '{submit_file}' to {target_problem.name}? [y/N]: "
+        ):
+            atcoder = self.login_atcoder(root_dir)
+            print(f"Submit {submit_file} to {target_problem} ...")
+            atcoder.submit(
+                target_problem, submit_file=submit_file, language_id=language_id
+            )
+        else:
+            print("Abort submitting.")
+            return
