@@ -4,28 +4,24 @@ A command line interface for AtCoder Problems.
 
 # Installation
 ```bash
-pip install git+https://github.com/n4okins/acp.git
+$ pip install git+https://github.com/n4okins/acp.git
+```
+```bash
+$ rye add acp --git=https://github.com/n4okins/acp.git
 ```
 
-```bash
-git clone https://github.com/n4okins/acp.git
-cd acp
-rye install
-```
 # Usage
 
 ### まず.envファイルを作成してください。
 ```bash
-echo "ATCODER_USERNAME=<your_atcoder_username>" >> .env
-echo "ATCODER_PASSWORD=<your_atcoder_password>" >> .env
+$ echo "ATCODER_USERNAME=<your_atcoder_username>" >> .env
+$ echo "ATCODER_PASSWORD=<your_atcoder_password>" >> .env
 ```
-
 ```
 $ cat .env
 ATCODER_USERNAME=<UserName>
 ATCODER_PASSWORD=<Password>
 ```
-
 
 # Commands
 ## Download virtual contest
