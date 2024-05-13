@@ -5,7 +5,7 @@ import requests
 import requests.cookies
 from bs4 import BeautifulSoup
 
-from src.general.utils import HttpStatusCode
+from .utils import HttpStatusCode
 
 logger = getLogger(__name__)
 

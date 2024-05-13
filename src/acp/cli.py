@@ -1,11 +1,8 @@
 import argparse
-import sys
 from pathlib import Path
 
-sys.path.append(str(Path(__file__).resolve().parents[2]))
-
-from src.acp.service import AtCoderProblems
-from src.atcoder.service import AtCoder
+from ..atcoder.service import AtCoder
+from .service import AtCoderProblems
 
 __version__ = "0.1.0"
 

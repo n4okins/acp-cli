@@ -1,6 +1,5 @@
 import enum
 import subprocess
-import sys
 import time
 from logging import getLogger
 from pathlib import Path

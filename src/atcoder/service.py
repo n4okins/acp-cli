@@ -6,10 +6,10 @@ from pathlib import Path
 import bs4
 from bs4 import BeautifulSoup
 
-from src.atcoder.judge import JudgeResult, JudgeRunner
-from src.atcoder.models import AtCoderContest, AtCoderProblem
-from src.general.service import WebService
-from src.general.utils import bg_color, color, reset_color
+from ..general.service import WebService
+from ..general.utils import bg_color, color, reset_color
+from .judge import JudgeResult, JudgeRunner
+from .models import AtCoderContest, AtCoderProblem
 
 logger = getLogger(__name__)
 

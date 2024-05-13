@@ -2,15 +2,15 @@ import json
 from logging import getLogger
 from pathlib import Path
 
-from src.acp.models import (
+from ..atcoder.models import AtCoderProblem
+from ..atcoder.service import AtCoder
+from ..general.service import WebService
+from ..general.utils import confirm_yn_input, load_env
+from .models import (
     AtCoderProblemsAPIResponse,
     AtCoderProblemsInnerProblem,
     AtCoderProblemsMetadata,
 )
-from src.atcoder.models import AtCoderProblem
-from src.atcoder.service import AtCoder
-from src.general.service import WebService
-from src.general.utils import confirm_yn_input, load_env
 
 logger = getLogger(__name__)
 
