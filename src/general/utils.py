@@ -1,12 +1,21 @@
 from enum import Enum
+from logging import getLogger
 from os import environ
 from pathlib import Path
 from typing import Callable
+
+logger = getLogger(__name__)
 
 
 def load_env(path: Path | None = None) -> dict[str, str]:
     if path is None:
         path = Path.cwd() / ".env"
+    if not path.exists():
+        for p in Path.cwd().parents:
+            if (p / ".env").exists():
+                path = p / ".env"
+                break
+    logger.info(f"Load environment variables from {path}")
     with path.open("r") as f:
         env = {line.split("=")[0]: line.split("=")[1].strip() for line in f.readlines()}
     environ.update(env)

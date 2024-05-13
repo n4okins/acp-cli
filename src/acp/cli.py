@@ -7,9 +7,17 @@ sys.path.append(str(Path(__file__).resolve().parents[2]))
 from src.acp.service import AtCoderProblems
 from src.atcoder.service import AtCoder
 
+__version__ = "0.1.0"
+
 
 def main():
     parser = argparse.ArgumentParser("AtCoder Problems command line tools")
+    parser.add_argument(
+        "--version",
+        "-v",
+        action="version",
+        version=f"%(prog)s {__version__}",
+    )
     acp = AtCoderProblems()
     subparsers = parser.add_subparsers(required=True)
     d = subparsers.add_parser(
@@ -115,7 +123,7 @@ def main():
             language_id=int(args.language),
             target_dir=args.directory,
         )
-    
+
     s.set_defaults(func=submit_hook)
 
     status = subparsers.add_parser(
