@@ -1,87 +1,21 @@
-import json
 import re
-import time
 import weakref
-from abc import ABC, abstractmethod
 from logging import getLogger
 from pathlib import Path
 
 import bs4
-import requests
-import requests.cookies
 from bs4 import BeautifulSoup
 
 from src.atcoder.judge import JudgeResult, JudgeRunner
 from src.atcoder.models import AtCoderContest, AtCoderProblem
-from src.general.utils import HttpStatusCode, bg_color, color, reset_color
+from src.general.service import WebService
+from src.general.utils import bg_color, color, reset_color
 
 logger = getLogger(__name__)
 
 
-class WebService(ABC):
-    class URLs:
-        pass
-
-    class Exceptions:
-        class AccessError(Exception):
-            pass
-
-        class LoginFailedError(Exception):
-            pass
-
-        class ProblemsNotFoundError(Exception):
-            pass
-
-    def __init__(self, parser: str = "lxml") -> None:
-        self._session: requests.Session = requests.Session()
-        self._response: requests.Response | None = None
-        self._soup: BeautifulSoup | None = None
-        self.parser = parser
-
-    def wait(self, seconds: float) -> None:
-        time.sleep(seconds)
-
-    @property
-    def session(self) -> requests.Session:
-        return self._session
-
-    @property
-    def is_logged_in(self) -> bool:
-        return False
-
-    @property
-    def response(self) -> requests.Response:
-        return self._response if self._response else requests.Response()
-
-    @property
-    def soup(self) -> BeautifulSoup:
-        return self._soup if self._soup else BeautifulSoup()
-
-    def get(self, url: str, *args: tuple, **kwargs: dict) -> BeautifulSoup:
-        logger.info("GET: %s", url)
-        self._response = self._session.get(url, *args, **kwargs)
-        if self.response.status_code != HttpStatusCode.OK.value:
-            msg = f"Failed to get {url}. Status code: {self.response.status_code}"
-            raise self.Exceptions.AccessError(msg)
-        self._soup = BeautifulSoup(self.response.text, self.parser)
-        return self.soup
-
-    def post(self, url: str, *args: tuple, **kwargs: dict) -> BeautifulSoup:
-        logger.info("POST: %s", url)
-        self._response = self._session.post(url, *args, **kwargs)
-        if self.response.status_code != HttpStatusCode.OK.value:
-            msg = f"Failed to post {url}. Status code: {self.response.status_code}"
-            raise self.Exceptions.AccessError(msg)
-        self._soup = BeautifulSoup(self.response.text, self.parser)
-        return self.soup
-
-    @abstractmethod
-    def login(self, data: dict) -> None:
-        pass
-
-    @property
-    def cookies(self) -> requests.cookies.RequestsCookieJar:
-        return self._session.cookies
+# TODO: Add AtCoder.from_url() method
+# TODO: use cookies to login
 
 
 class AtCoder(WebService):
@@ -178,7 +112,7 @@ class AtCoder(WebService):
             5088: "Emacs Lisp (No Compile) (GNU Emacs 28.2)",
             5089: "Unison (Unison M5b)",
             5090: "COBOL (GnuCOBOL(Fixed) 3.1.2)",
-        }
+        },
     }
 
     class URLs(WebService.URLs):
@@ -188,9 +122,6 @@ class AtCoder(WebService):
 
     class AtCoderExceptions(WebService.Exceptions):
         pass
-
-    def __init__(self) -> None:
-        super().__init__()
 
     def get(
         self,
@@ -492,15 +423,16 @@ class AtCoder(WebService):
         for i in range(10):
             self.get(problem.contest.url + "/submissions/me", use_cache=False)
             latest = BeautifulSoup(self.response.text, self.parser)
-            judge = latest.find("span", class_="label").attrs["title"]
-            status = [td.text.strip() for td in latest.find_all("tr")[1].find_all("td")][:-1]
+            judge = latest.find("span", class_="label").attrs["title"]  # type: ignore
+            status = [
+                td.text.strip() for td in latest.find_all("tr")[1].find_all("td")
+            ][:-1]
             print(judge, " | ".join(status))
             if judge not in ["ジャッジ待ち", "ジャッジ中"]:
                 break
-            self.wait(3)
+            self.wait(5)
         else:
             print("Time out.")
-
 
         # self.wait(1)
         # for i in range(30):

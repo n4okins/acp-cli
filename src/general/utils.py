@@ -46,3 +46,19 @@ def bg_color(r: int, g: int, b: int, style: int = 2) -> str:
 
 def reset_color() -> str:
     return "\033[0m"
+
+
+def confirm_yn_input(msg: str = ""):
+    x = input(msg)
+    while True:
+        try:
+            if x in ["y", "Y"]:
+                return True
+            elif x in ["n", "N"]:
+                return False
+            else:
+                x = input(msg)
+
+        except Exception as e:
+            print(e)
+            break
