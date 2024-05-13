@@ -1,4 +1,4 @@
-# acp-cli (AtCoder Problems Command Line Interface)
+# acp-cli (AtCoder Problems Command Line Interface) (dev)
 
 A command line interface for AtCoder Problems.
 
