@@ -1,7 +1,7 @@
 import argparse
 from pathlib import Path
 
-from ..atcoder.service import AtCoder
+from .atcoder.service import AtCoder
 from .service import AtCoderProblems
 
 __version__ = "0.1.0"

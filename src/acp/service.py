@@ -2,10 +2,10 @@ import json
 from logging import getLogger
 from pathlib import Path
 
-from ..atcoder.models import AtCoderProblem
-from ..atcoder.service import AtCoder
-from ..general.service import WebService
-from ..general.utils import confirm_yn_input, load_env
+from .atcoder.models import AtCoderProblem
+from .atcoder.service import AtCoder
+from .general.service import WebService
+from .general.utils import confirm_yn_input, load_env
 from .models import (
     AtCoderProblemsAPIResponse,
     AtCoderProblemsInnerProblem,
