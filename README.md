@@ -7,7 +7,7 @@ A command line interface for AtCoder Problems.
 $ pip install git+https://github.com/n4okins/acp.git
 ```
 ```bash
-$ rye add acp --git=https://github.com/n4okins/acp.git
+$ rye install acp --git=https://github.com/n4okins/acp.git
 ```
 
 # Usage

@@ -1,10 +1,10 @@
 [project]
 name = "acp"
-version = "0.1.0"
 description = "Add your description here"
 authors = [
     { name = "n4okins", email = "63445867+n4okins@users.noreply.github.com" }
 ]
+dynamic = ["version"]
 dependencies = [
     "beautifulsoup4>=4.12.3",
     "requests>=2.31.0",
@@ -27,6 +27,9 @@ dev-dependencies = [
 
 [project.scripts]
 acp = "acp.cli:main"
+
+[tool.hatch.version]
+path = "src/acp/__version__.py"
 
 [tool.hatch.metadata]
 allow-direct-references = true

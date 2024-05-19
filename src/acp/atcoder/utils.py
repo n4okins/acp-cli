@@ -1,7 +1,6 @@
 import sys
 
 
-
 def force_input(prompt: str) -> str:
     x = input(prompt)
     while True:
@@ -15,6 +14,3 @@ def force_input(prompt: str) -> str:
         except EOFError:
             print("EOF. Exiting...")
             sys.exit(1)
-
-
-

@@ -46,10 +46,7 @@ class JudgeRunner:
         return (
             stdout.decode(),
             proc.returncode,
-            (
-                stdout.decode(),
-                stderr.decode()
-            ),
+            (stdout.decode(), stderr.decode()),
         )
 
     def check(self, output_testcase_file: Path, answer: str) -> bool:

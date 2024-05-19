@@ -1,10 +1,9 @@
 import argparse
 from pathlib import Path
 
+from .__version__ import __version__
 from .atcoder.service import AtCoder
 from .service import AtCoderProblems
-
-__version__ = "0.1.0"
 
 
 def main():
