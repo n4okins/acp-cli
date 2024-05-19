@@ -1,9 +1,9 @@
 import argparse
 from pathlib import Path
 
-from .__version__ import __version__
-from .atcoder.service import AtCoder
-from .service import AtCoderProblems
+from acp.__version__ import __version__
+from acp.atcoder.service import AtCoder
+from acp.service import AtCoderProblems
 
 
 def main():

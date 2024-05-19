@@ -2,11 +2,11 @@ import json
 from logging import getLogger
 from pathlib import Path
 
-from .atcoder.models import AtCoderProblem
-from .atcoder.service import AtCoder
-from .general.service import WebService
-from .general.utils import confirm_yn_input, load_env
-from .models import (
+from acp.atcoder.models import AtCoderProblem
+from acp.atcoder.service import AtCoder
+from acp.general.service import WebService
+from acp.general.utils import confirm_yn_input, load_env
+from acp.models import (
     AtCoderProblemsAPIResponse,
     AtCoderProblemsInnerProblem,
     AtCoderProblemsMetadata,
@@ -80,7 +80,7 @@ class AtCoderProblems(WebService):
                 cache_path = parent / ".acp"
                 root_dir = parent
                 if cache_path.exists():
-                    break
+                    return cache_path
         return Path.cwd() / ".acp"
 
     def fetch_all_problems_metadata(self) -> dict[str, AtCoderProblemsMetadata]:

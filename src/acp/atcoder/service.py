@@ -6,16 +6,19 @@ from pathlib import Path
 import bs4
 from bs4 import BeautifulSoup
 
-from ..general.service import WebService
-from ..general.utils import bg_color, color, reset_color
-from .judge import JudgeResult, JudgeRunner
-from .models import AtCoderContest, AtCoderProblem
+from acp.general.service import WebService
+from acp.general.utils import bg_color, color, reset_color
+from acp.atcoder.judge import JudgeResult, JudgeRunner
+from acp.atcoder.models import AtCoderContest, AtCoderProblem
 
 logger = getLogger(__name__)
 
 
 # TODO: Add AtCoder.from_url() method
 # TODO: use cookies to login
+
+
+__all__ = ["AtCoder"]
 
 
 class AtCoder(WebService):
