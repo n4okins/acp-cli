@@ -7,7 +7,14 @@ from pathlib import Path
 logger = getLogger(__name__)
 
 
+__all__ = ["JudgeResult", "JudgeRunner"]
+
+
 class JudgeResult(enum.Enum):
+    """
+    実行結果
+    """
+
     AC = "AC"  # Accepted
     WA = "WA"  # Wrong Answer
     TLE = "TLE"  # Time Limit Exceeded
@@ -19,7 +26,19 @@ class JudgeResult(enum.Enum):
 
 
 class JudgeRunner:
+    """
+    プログラムを実行し、結果を判定するクラス
+    """
+
     def __init__(self, command: list[str], cd: Path | None = None) -> None:
+        """
+        Args:
+            command (list[str]): 実行コマンド
+            cd (Path | None, optional): 実行ディレクトリ. Defaults to None.
+        
+        Examples:
+            >>> runner = JudgeRunner(["python3", "main.py"], Path("contest"))
+        """
         self.command = command
         self.cd = cd or Path.cwd()
         logger.info("Command: %s", self.command)
@@ -28,6 +47,14 @@ class JudgeRunner:
     def run(
         self, input_testcase_file: Path | str, timeout: int = 60
     ) -> tuple[str, int, tuple[str, str]]:
+        """
+        Args:
+            input_testcase_file (Path | str): 入力ファイル
+            timeout (int, optional): タイムアウト秒数. Defaults to 60.
+
+        Returns:
+            tuple[str, int, tuple[str, str]]: 出力, リターンコード, (stdout, stderr)
+        """
         input_testcase_file = (
             input_testcase_file
             if isinstance(input_testcase_file, Path)
@@ -50,6 +77,14 @@ class JudgeRunner:
         )
 
     def check(self, output_testcase_file: Path, answer: str) -> bool:
+        """
+        Args:
+            output_testcase_file (Path): テストケース
+            answer (str): 自分の答え
+        
+        Returns:
+            bool: 正解かどうか (True: 正解, False: 不正解)
+        """
         return output_testcase_file.read_text() == answer
 
     def __call__(
@@ -59,15 +94,14 @@ class JudgeRunner:
         timelimit: int = 2,
     ) -> tuple[JudgeResult, dict]:
         """
-        Run the program with the input test case file and check the output.
-
         Args:
-            input_testcase_file (Path): The input test case file.
-            output_testcase_file (Path): The output test case file.
-            timeout (int, optional): The timeout seconds. Defaults to 2.
-
+            input_testcase_file (Path): 入力ファイル
+            output_testcase_file (Path): テストケース
+            timelimit (int, optional): タイムアウト秒数. Defaults to 2.
+        
         Returns:
-            tuple[tuple[bool, bool], dict[str, str | float]]: Result and Metadata.
+            tuple[JudgeResult, dict]: 判定結果, 実行結果
+            
         """
         start = time.perf_counter()
         answer, return_code, (stdout, stderr) = self.run(input_testcase_file)

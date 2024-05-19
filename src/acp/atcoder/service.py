@@ -22,6 +22,10 @@ __all__ = ["AtCoder"]
 
 
 class AtCoder(WebService):
+    """
+    AtCoderの問題を取得するためのクラス
+    """
+
     _cache: dict = {
         "submit": {},
         "lang": {
@@ -117,6 +121,20 @@ class AtCoder(WebService):
             5090: "COBOL (GnuCOBOL(Fixed) 3.1.2)",
         },
     }
+    """
+    キャッシュ
+    dict: {
+        "url": {
+            "example.com": {
+                "response": requests.Response,
+                "soup": BeautifulSoup
+            },
+        },
+        "lang": {
+            "language_id": "language_name"
+        }
+    }
+    """
 
     class URLs(WebService.URLs):
         BASE = "https://atcoder.jp"
@@ -135,13 +153,37 @@ class AtCoder(WebService):
         use_cache: bool = True,
         **kwargs: dict,
     ) -> BeautifulSoup:
+        """
+        getメソッド
+        requests.getを実行し、BeautifulSoupオブジェクトを返す
+
+        self._soupにBeautifulSoupオブジェクトを格納して、
+        self._responseにrequests.Responseオブジェクトを格納する
+
+        use_cacheがTrueの場合はキャッシュを使用する
+
+
+        Args:
+            url (str): URL
+            params (dict, optional): URLパラメータ. Defaults to {}.
+            headers (dict, optional): ヘッダー. Defaults to {}.
+            *args (tuple): requests.getの引数
+            use_cache (bool, optional): キャッシュを使用するか. Defaults to True.
+            **kwargs (dict): requests.getのキーワード引数
+
+        Returns:
+            BeautifulSoup: BeautifulSoupオブジェクト
+        """
         if use_cache and url in self._cache:
-            self._response = self._cache[url]["response"]
-            self._soup = self._cache[url]["soup"]
+            # キャッシュが存在する場合はキャッシュを返す
+            self._response = self._cache["url"][url]["response"]
+            self._soup = self._cache["url"][url]["soup"]
             return self.soup
-        params.update({"lang": "ja"})
+        params.update(
+            {"lang": "ja"}
+        )  # 言語を日本語に設定 (AtCoderでURLの最後に?lang=ja)
         super().get(url, *args, params=params, headers=headers, **kwargs)
-        self._cache[url] = {"response": self.response, "soup": self.soup}
+        self._cache["url"][url] = dict(response=self.response, soup=self.soup)
         return self.soup
 
     def post(  # type: ignore
@@ -152,11 +194,14 @@ class AtCoder(WebService):
         *args: tuple,
         **kwargs: dict,
     ) -> BeautifulSoup:
-        params.update({"lang": "ja"})
+        params.update({"lang": "ja"})  # 同上
         return super().post(url, *args, params=params, headers=headers, **kwargs)
 
     @property
     def alerts(self) -> dict[str, list[str]]:
+        """
+        画面上のアラートを取得する
+        """
         alerts: dict[str, list[str]] = {
             "success": [],
             "info": [],
@@ -169,6 +214,10 @@ class AtCoder(WebService):
 
     @property
     def is_logged_in(self) -> bool:
+        """
+        ログインしているかどうか
+        settingsページにアクセスできるかで判断
+        """
         return self._session.get(self.URLs.SETTINGS).url == self.URLs.SETTINGS
 
     def login(self, username: str, password: str) -> None:  # type: ignore
@@ -181,24 +230,27 @@ class AtCoder(WebService):
         self.wait(0.5)
         form: bs4.Tag = res.find("form", action="")  # type: ignore
 
-        *_, csrf_token = form.find_all("input")
+        *_, csrf_token = form.find_all("input")  # inputタグを取得
         data = {
             "username": username,
             "password": password,
             "csrf_token": csrf_token["value"],
         }
-        self.post(
+        self.post(  # ログインページにPOST
             self.URLs.LOGIN,
             data=data,
         )
-        self.wait(0.5)
+        self.wait(0.5)  # 0.5秒待機
+
         if self.alerts["danger"]:
-            raise self.AtCoderExceptions.LoginFailedError(self.alerts["danger"])
-        elif self.alerts["warning"]:
+            raise self.AtCoderExceptions.LoginFailedError(
+                self.alerts["danger"]
+            )  # ログイン失敗時のエラー
+        if self.alerts["warning"]:
             logger.warning("Alerts: %s", self.alerts["warning"])
-        elif self.alerts["info"]:
+        if self.alerts["info"]:
             logger.info("Alerts: %s", self.alerts["info"])
-        elif self.alerts["success"]:
+        if self.alerts["success"]:
             logger.info("Alerts: %s", self.alerts["success"])
 
     def get_contest(self, contest: str, use_cache: bool = True) -> AtCoderContest:
@@ -207,6 +259,9 @@ class AtCoder(WebService):
             if f"{self.URLs.BASE}/contests/" in contest
             else f"{self.URLs.BASE}/contests/{contest}"
         )
+        """
+        コンテストの問題を取得する
+        """
         c = AtCoderContest(name=contest.split("/")[-1], url=contest)
         self.get(c.url, use_cache=use_cache)
         table = self.soup.find("table", class_="table")
@@ -233,6 +288,18 @@ class AtCoder(WebService):
         contest: AtCoderContest | None = None,
         point: int = 0,
     ) -> AtCoderProblem:
+        """
+        AtCoderの問題ページから情報を取得する
+
+        Args:
+            url (str): 問題のURL
+            difficulty (str, optional): 問題の難易度. Defaults to "".
+            contest (AtCoderContest, optional): コンテスト. Defaults to None.
+            point (int, optional): 配点. Defaults to 0.
+
+        Returns:
+            AtCoderProblem: 問題の情報
+        """
         problem = AtCoderProblem(
             difficulty=difficulty,
             url=url,
@@ -244,6 +311,7 @@ class AtCoder(WebService):
         )
         self.get(problem.url)
         if not self._cache["lang"]:
+            # 言語のキャッシュがない場合は取得 （現在はコードに直書きしてる）
             try:
                 for lang in self.soup.find_all("option"):
                     if lang.text:
@@ -256,6 +324,7 @@ class AtCoder(WebService):
         if title is None:
             msg = f"Title not found in {problem.url}. Is the problem ID correct?"
             raise self.AtCoderExceptions.ProblemsNotFoundError(msg)
+
         problem.title = title.text.strip().split("\n")[0].split(" - ")[1]
         problem.name = problem.url.split("/")[-1]
         problem.root_dir = Path.cwd() / problem.contest.name / problem.name.lower()
@@ -264,6 +333,13 @@ class AtCoder(WebService):
     def download_problem(
         self, problem: AtCoderProblem, target_dir: str | Path | None = None
     ) -> None:
+        """
+        AtCoderの問題の入出力例をダウンロードする
+
+        Args:
+            problem (AtCoderProblem): 問題
+            target_dir (str | Path | None, optional): ダウンロード先ディレクトリ. Defaults to proble.root_dir
+        """
         target_dir = Path(target_dir) if target_dir else problem.root_dir
 
         (target_dir / "in").mkdir(exist_ok=True, parents=True)
@@ -275,8 +351,10 @@ class AtCoder(WebService):
         # Parse problem statement
         sample = re.compile(r"<h3>[入出]力例 \d+</h3><pre>([^<]+)[\n\r]</pre>").findall(
             str(self.soup)
-        )
+        )  # 正規表現で入出力例を取得
+
         for i, s in enumerate(sample):
+            # 入出力例をファイルに書き込む
             if i % 2 == 0:
                 with (target_dir / "in" / f"sample-{i // 2}.in").open("w") as f:
                     f.write(s)
@@ -284,9 +362,15 @@ class AtCoder(WebService):
                 with (target_dir / "out" / f"sample-{i // 2}.out").open("w") as f:
                     f.write(s)
 
-    def download_contest(self, contest: AtCoderContest):
+    def download_contest(self, contest: AtCoderContest) -> None:
+        """
+        AtCoderのコンテストの問題をダウンロードする
+
+        Args:
+            contest (AtCoderContest): コンテスト
+        """
         for problem in contest.problems.values():
-            self.download_problem(problem)
+            self.download_problem(problem)  # 問題ごとにダウンロード
 
     def test(
         self,
@@ -294,14 +378,29 @@ class AtCoder(WebService):
         *,
         target_dir: Path | str | None = None,
         command: list[str] = ["python", "main.py"],
-    ):
+    ) -> None:
+        """
+        AtCoderの問題をテストする
+
+        Args:
+            problem (AtCoderProblem): 問題
+            target_dir (Path | str | None, optional): テストするディレクトリ. Defaults to None.
+            command (list[str], optional): 実行コマンド. Defaults to ["python", "main.py"].
+
+        Examples:
+            >>> atcoder.test(problem)  # test in the problem's root directory
+            >>> atcoder.test(problem, target_dir="contest")  # test in the "contest" directory
+            >>> atcoder.test(problem, command=["python3", "main.py"])  # test with the command "python3 main.py"
+        """
         target_dir = (
             Path(target_dir)
             if isinstance(target_dir, str)
             else target_dir or problem.root_dir
-        )
+        )  # テストするディレクトリ
 
-        runner = JudgeRunner(command=command, cd=target_dir)
+        runner = JudgeRunner(
+            command=command, cd=target_dir
+        )  # JudgeRunnerのインスタンス
         lines = []
         lines.append(
             color(255, 255, 255)
@@ -323,12 +422,12 @@ class AtCoder(WebService):
             JudgeResult.RE: color(255, 255, 64),  # Yellow
             JudgeResult.TLE: color(255, 192, 128),  # Orange
             JudgeResult.IE: color(64, 255, 255),  # Cyan
-        }
+        }  # 表示色
         for i in range(len(list((target_dir / "in").iterdir()))):
             code, meta = runner(
                 target_dir / "in" / f"sample-{i}.in",
                 target_dir / "out" / f"sample-{i}.out",
-            )
+            )  # JudgeRunnerで実行
             line = (
                 bg_color(32, 32, 32)
                 + color(255, 255, 255)
@@ -384,6 +483,9 @@ class AtCoder(WebService):
             print(line)
 
     def guess_directory(self, problem: AtCoderProblem) -> Path:
+        """
+        problemのあるディレクトリを簡易的に推測する
+        """
         cd = Path.cwd()
         standard = cd / problem.contest.name / problem.name.lower()
         if standard.exists():
@@ -399,17 +501,42 @@ class AtCoder(WebService):
         *,
         submit_file: Path | str = "main.py",
         language_id: int = 5055,  # Python (CPython 3.11.4)
-    ):
+    ) -> None:
+        """
+        AtCoderに問題を提出する
+
+        Args:
+            problem (AtCoderProblem): 問題
+            submit_file (Path | str, optional): 提出するファイル. Defaults to "main.py".
+            language_id (int, optional): 言語ID. Defaults to 5055 (Python (CPython 3.11.4)).
+
+        Raises:
+            FileNotFoundError: 提出ファイルが見つからない場合
+
+        Examples:
+            >>> atcoder.submit(problem)  # submit "main.py"
+            >>> atcoder.submit(problem, submit_file="main.cpp", language_id=5017)  # submit "main.cpp" with language ID 5017 (C (gcc 12.2.0))
+        """
         submit_file = Path(submit_file) if isinstance(submit_file, str) else submit_file
+
         if not submit_file.is_absolute():
+            # 絶対パスでない場合は問題のディレクトリからの相対パスとして扱う
             submit_file = problem.root_dir / submit_file
+
         if not submit_file.exists():
+            # 提出ファイルが存在しない場合は推測してみる
             submit_file = self.guess_directory(problem) / submit_file.name
+
         if not submit_file.exists():
+            # それでも存在しない場合はエラー
             raise FileNotFoundError(f"{submit_file} not found.")
+
         submit_url = problem.contest.url + "/submit"
+
         self.get(submit_url)
         self.wait(0.1)
+
+        # 提出フォームを取得
         form: bs4.Tag = self.soup.find(
             "form", action=f"/contests/{problem.contest.name.lower()}/submit"
         )  # type: ignore
@@ -417,19 +544,22 @@ class AtCoder(WebService):
         data = {
             "data.TaskScreenName": problem.name,
             "data.LanguageId": language_id,
-            "sourceCode": submit_file.read_text(),
+            "sourceCode": submit_file.read_text(),  # 提出ファイルの内容
             "csrf_token": csrf_token,
         }
         self.post(submit_url, data=data)
         self.wait(1)
+
         submittion_result_url = problem.contest.url + "/submissions/me"
-        for i in range(10):
+        # 提出結果のURL
+        for i in range(12):  # 5秒 * 12 = 60秒待機
+            # 5秒ごとに提出結果を取得
             self.get(submittion_result_url, use_cache=False)
             latest = BeautifulSoup(self.response.text, self.parser)
             judge = latest.find("span", class_="label").attrs["title"]  # type: ignore
             status = [
                 td.text.strip() for td in latest.find_all("tr")[1].find_all("td")
-            ][:-1]
+            ][:-1]  # 提出結果の列を取得
             print(judge, " | ".join(status))
             if judge not in ["ジャッジ待ち", "ジャッジ中"]:
                 print(
@@ -438,4 +568,4 @@ class AtCoder(WebService):
                 break
             self.wait(5)
         else:
-            print("Time out.")
+            print("1分以上経ってもジャッジが終わりませんでした。")

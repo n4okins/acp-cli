@@ -4,6 +4,10 @@ from pydantic import BaseModel, ConfigDict
 
 
 class AtCoderProblem(BaseModel):
+    """
+    AtCoderの問題1つを表すモデル
+    """
+
     difficulty: str
     url: str
     contest: "AtCoderContest"
@@ -18,17 +22,23 @@ class AtCoderProblem(BaseModel):
 
 
 class AtCoderContest(BaseModel):
+    """
+    AtCoderのコンテストを表すモデル
+    """
+
     name: str
     url: str
     problems: dict[str, AtCoderProblem] = dict()
     points: dict[str, int] = dict()
 
-    model_config = ConfigDict(arbitrary_types_allowed=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True)  # pydanticの設定
 
     def __getattr__(self, attr: str) -> AtCoderProblem:
+        # self.a などで問題を取得できるようにする
         return self.problems[attr]
 
     def __getitem__(self, key: str) -> AtCoderProblem:
+        # self["a"] などで問題を取得できるようにする
         return self.problems[key]
 
     def __str__(self) -> str:

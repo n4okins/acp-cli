@@ -11,6 +11,10 @@ logger = getLogger(__name__)
 
 
 class WebService:
+    """
+    Webサービスにアクセスしてアレコレするための基底クラス
+    """
+
     class URLs:
         pass
 
@@ -50,8 +54,23 @@ class WebService:
         return self._soup if self._soup else BeautifulSoup()
 
     def get(self, url: str, *args: tuple, **kwargs: dict) -> BeautifulSoup:
+        """
+        getメソッド
+        requests.getを実行し、BeautifulSoupオブジェクトを返す
+        self._soupにBeautifulSoupオブジェクトを格納して、
+        self._responseにrequests.Responseオブジェクトを格納する
+
+        Args:
+            url (str): URL
+            *args (tuple): requests.getの引数
+            **kwargs (dict): requests.getのキーワード引数
+
+        Returns:
+            BeautifulSoup: BeautifulSoupオブジェクト
+        """
+
         logger.info("GET: %s", url)
-        self._response = self._session.get(url, *args, **kwargs) # type: ignore
+        self._response = self._session.get(url, *args, **kwargs)  # type: ignore
         if self.response.status_code != HttpStatusCode.OK.value:
             msg = f"Failed to get {url}. Status code: {self.response.status_code}"
             raise self.Exceptions.AccessError(msg)
@@ -59,8 +78,22 @@ class WebService:
         return self.soup
 
     def post(self, url: str, *args: tuple, **kwargs: dict) -> BeautifulSoup:
+        """
+        postメソッド
+        requests.postを実行し、BeautifulSoupオブジェクトを返す
+        self._soupにBeautifulSoupオブジェクトを格納して、
+        self._responseにrequests.Responseオブジェクトを格納する
+
+        Args:
+            url (str): URL
+            *args (tuple): requests.postの引数
+            **kwargs (dict): requests.postのキーワード引数
+
+        Returns:
+            BeautifulSoup: BeautifulSoupオブジェクト
+        """
         logger.info("POST: %s", url)
-        self._response = self._session.post(url, *args, **kwargs) # type: ignore
+        self._response = self._session.post(url, *args, **kwargs)  # type: ignore
         if self.response.status_code != HttpStatusCode.OK.value:
             msg = f"Failed to post {url}. Status code: {self.response.status_code}"
             raise self.Exceptions.AccessError(msg)
@@ -68,6 +101,9 @@ class WebService:
         return self.soup
 
     def login(self, data: dict) -> None:
+        """
+        ログイン処理とか
+        """
         pass
 
     @property

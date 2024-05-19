@@ -1,6 +1,6 @@
+import os
 from enum import Enum
 from logging import getLogger
-from os import environ
 from pathlib import Path
 from typing import Callable
 
@@ -8,31 +8,42 @@ logger = getLogger(__name__)
 
 
 def load_env(path: Path | None = None) -> dict[str, str]:
+    """
+    .envファイルを読み込んで環境変数に設定する
+
+    Args:
+        path (Path | None, optional): .envファイルのパス. Defaults to None.
+
+    Returns:
+        dict[str, str]: .envから読み込んだ環境変数
+    """
     if path is None:
         path = Path.cwd() / ".env"
     if not path.exists():
+        # カレントディレクトリに.envがなければ親ディレクトリを探索
         for p in Path.cwd().parents:
             if (p / ".env").exists():
+                # .envファイルが見つかったらそれを読み込む
                 path = p / ".env"
                 break
     logger.info(f"Load environment variables from {path}")
+    if not path.exists():
+        logger.warning(f"{path} does not exist.")
+        return {}
+
     with path.open("r") as f:
+        # .envファイルを読み込んで環境変数に設定
+        # 例: KEY=VALUE
         env = {line.split("=")[0]: line.split("=")[1].strip() for line in f.readlines()}
-    environ.update(env)
-    return env
-
-
-def set_default(
-    target: object, attr: str, default_type: Callable, default_value: object = None
-) -> object:
-    if hasattr(target, attr):
-        setattr(target, attr, default_type(getattr(target, attr)))
-        return getattr(target, attr)
-    setattr(target, attr, default_value)
-    return default_value
+    os.environ.update(env)  # 環境変数を更新
+    return env  # .envの内容を返す
 
 
 class HttpStatusCode(Enum):
+    """
+    HTTPステータスコード
+    """
+
     OK = 200
     BAD_REQUEST = 400
     UNAUTHORIZED = 401
@@ -45,19 +56,47 @@ class HttpStatusCode(Enum):
     UNKNOWN = -1
 
 
-def color(r: int, g: int, b: int, style: int = 2) -> str:
-    return f"\033[38;{style};{r};{g};{b}m"
+def color(r: int, g: int, b: int) -> str:
+    """
+    ターミナルに色を付けるためのANSIエスケープシーケンスを生成する
+
+    Args:
+        r (int): 赤成分 0-255
+        g (int): 緑成分 0-255
+        b (int): 青成分 0-255
+    """
+    return f"\033[38;2;{r};{g};{b}m"
 
 
-def bg_color(r: int, g: int, b: int, style: int = 2) -> str:
-    return f"\033[48;{style};{r};{g};{b}m"
+def bg_color(r: int, g: int, b: int) -> str:
+    """
+    ターミナルに背景色を付けるためのANSIエスケープシーケンスを生成する
+
+    Args:
+        r (int): 赤成分 0-255
+        g (int): 緑成分 0-255
+        b (int): 青成分 0-255
+    """
+    return f"\033[48;2;{r};{g};{b}m"
 
 
 def reset_color() -> str:
+    """
+    ターミナルの色をリセットするためのANSIエスケープシーケンスを生成する
+    """
     return "\033[0m"
 
 
-def confirm_yn_input(msg: str = ""):
+def confirm_yn_input(msg: str = "") -> bool:
+    """
+    ユーザーにy/nで確認する
+
+    Args:
+        msg (str, optional): メッセージ. Defaults to "".
+
+    Returns:
+        y/YならTrue, n/NならFalse
+    """
     x = input(msg)
     while True:
         try:
@@ -70,4 +109,4 @@ def confirm_yn_input(msg: str = ""):
 
         except Exception as e:
             print(e)
-            break
+            return False

@@ -14,12 +14,20 @@ class AtCoderProblemsInfo(BaseModel):
 
 
 class AtCoderProblemsInnerProblem(BaseModel):
+    """
+    AtCoder ProblemsのAPIの内部の問題データ
+    """
+
     id: str
     point: None | int
     order: int
 
 
 class AtCoderProblemsMetadata(BaseModel):
+    """
+    https://kenkoooo.com/atcoder/resources/problems.json から取得する問題のメタデータ
+    """
+
     id: str
     contest_id: str
     problem_index: str
