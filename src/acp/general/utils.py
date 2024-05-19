@@ -2,7 +2,6 @@ import os
 from enum import Enum
 from logging import getLogger
 from pathlib import Path
-from typing import Callable
 
 logger = getLogger(__name__)
 
