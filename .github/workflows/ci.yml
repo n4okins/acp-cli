@@ -1,5 +1,11 @@
 name: CI
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - dev
 
 jobs:
   lint:
@@ -28,4 +34,4 @@ jobs:
 
       - name: Run tests
         run: |
-          rye run pytest .
+          rye test

@@ -19,5 +19,6 @@ tmp/
 contests/
 *.in
 *.out
+pytest*.*
 
 main.py

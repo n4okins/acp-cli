@@ -1,6 +1,6 @@
 from acp.atcoder.service import AtCoder
 
 
-def main():
+def test_atcoder():
     atc = AtCoder()
-    del atc
+    assert atc is not None
