@@ -6,10 +6,10 @@ from pathlib import Path
 import bs4
 from bs4 import BeautifulSoup
 
-from acp.general.service import WebService
-from acp.general.utils import bg_color, color, reset_color
 from acp.atcoder.judge import JudgeResult, JudgeRunner
 from acp.atcoder.models import AtCoderContest, AtCoderProblem
+from acp.general.service import WebService
+from acp.general.utils import bg_color, color, reset_color
 
 logger = getLogger(__name__)
 
@@ -238,7 +238,7 @@ class AtCoder(WebService):
             url=url,
             contest=contest
             or AtCoderContest(
-                name=url.split("/")[-3], url="/".join(url.split("/")[:-2])
+                name=url.split("/")[-3], url="/".join(url.split("/")[:-2]),
             ),
             point=point,
         )
