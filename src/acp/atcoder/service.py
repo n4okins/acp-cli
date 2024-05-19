@@ -1,6 +1,7 @@
 import re
 import weakref
 from logging import getLogger
+from typing_extensions import override
 from pathlib import Path
 
 import bs4
@@ -126,7 +127,7 @@ class AtCoder(WebService):
     class AtCoderExceptions(WebService.Exceptions):
         pass
 
-    def get(
+    def get( # type: ignore
         self,
         url: str,
         params: dict = {},
@@ -144,7 +145,7 @@ class AtCoder(WebService):
         self._cache[url] = {"response": self.response, "soup": self.soup}
         return self.soup
 
-    def post(
+    def post( # type: ignore
         self,
         url: str,
         params: dict = {},
@@ -157,7 +158,7 @@ class AtCoder(WebService):
 
     @property
     def alerts(self) -> dict[str, list[str]]:
-        alerts = {
+        alerts: dict[str, list[str]] = {
             "success": [],
             "info": [],
             "warning": [],
@@ -171,7 +172,7 @@ class AtCoder(WebService):
     def is_logged_in(self) -> bool:
         return self._session.get(self.URLs.SETTINGS).url == self.URLs.SETTINGS
 
-    def login(self, username: str, password: str) -> None:
+    def login(self, username: str, password: str) -> None: # type: ignore
         if self.is_logged_in:
             return
         logger.info("Logging in...")
@@ -418,7 +419,7 @@ class AtCoder(WebService):
             "data.TaskScreenName": problem.name,
             "data.LanguageId": language_id,
             "sourceCode": submit_file.read_text(),
-            "csrf_token": csrf_token,  # type: ignore,
+            "csrf_token": csrf_token,
         }
         self.post(submit_url, data=data)
         self.wait(1)

@@ -51,7 +51,7 @@ class WebService:
 
     def get(self, url: str, *args: tuple, **kwargs: dict) -> BeautifulSoup:
         logger.info("GET: %s", url)
-        self._response = self._session.get(url, *args, **kwargs)
+        self._response = self._session.get(url, *args, **kwargs) # type: ignore
         if self.response.status_code != HttpStatusCode.OK.value:
             msg = f"Failed to get {url}. Status code: {self.response.status_code}"
             raise self.Exceptions.AccessError(msg)
@@ -60,7 +60,7 @@ class WebService:
 
     def post(self, url: str, *args: tuple, **kwargs: dict) -> BeautifulSoup:
         logger.info("POST: %s", url)
-        self._response = self._session.post(url, *args, **kwargs)
+        self._response = self._session.post(url, *args, **kwargs) # type: ignore
         if self.response.status_code != HttpStatusCode.OK.value:
             msg = f"Failed to post {url}. Status code: {self.response.status_code}"
             raise self.Exceptions.AccessError(msg)

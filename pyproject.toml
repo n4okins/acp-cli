@@ -24,6 +24,8 @@ dev-dependencies = [
     "ruff>=0.4.4",
     "pytest>=8.2.0",
     "mypy>=1.10.0",
+    "types-beautifulsoup4>=4.12.0.20240511",
+    "types-requests>=2.31.0.20240406",
 ]
 
 [project.scripts]

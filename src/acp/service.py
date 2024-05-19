@@ -30,7 +30,7 @@ class AtCoderProblems(WebService):
     def __init__(self, parser: str = "lxml") -> None:
         super().__init__(parser)
 
-        self.problems_metadata = {}
+        self.problems_metadata: dict[str, AtCoderProblemsMetadata] = {}
 
     def login_atcoder(self, root_dir: Path) -> AtCoder:
         atcoder_client = AtCoder()
