@@ -24,6 +24,9 @@ iniconfig==2.0.0
     # via pytest
 lxml==5.2.2
     # via acp
+mypy==1.10.0
+mypy-extensions==1.0.0
+    # via mypy
 packaging==24.0
     # via pytest
 pluggy==1.5.0
@@ -39,8 +42,10 @@ ruff==0.4.4
 soupsieve==2.5
     # via beautifulsoup4
 tomli==2.0.1
+    # via mypy
     # via pytest
 typing-extensions==4.11.0
+    # via mypy
     # via pydantic
     # via pydantic-core
 urllib3==2.2.1

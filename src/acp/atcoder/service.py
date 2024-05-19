@@ -238,7 +238,7 @@ class AtCoder(WebService):
             url=url,
             contest=contest
             or AtCoderContest(
-                name=url.split("/")[-3], url="/".join(url.split("/")[:-2]),
+                name=url.split("/")[-3], url="/".join(url.split("/")[:-2])
             ),
             point=point,
         )
