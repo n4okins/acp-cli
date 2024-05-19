@@ -1,6 +1,7 @@
 from pathlib import Path
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
+from pydantic.dataclasses import dataclass
 
 
 class AtCoderProblem(BaseModel):
@@ -17,14 +18,12 @@ class AtCoderProblem(BaseModel):
         return f"<AtCoderProblem {self.contest.name.upper()}-{self.difficulty} '{self.title}' - {self.point} [pts] ({self.url})>"
 
 
+@dataclass(config=ConfigDict(arbitrary_types_allowed=True))
 class AtCoderContest(BaseModel):
     name: str
     url: str
     problems: dict[str, AtCoderProblem] = {}
     points: dict[str, int] = {}
-
-    class Config:
-        arbitrary_types_allowed = True
 
     def __getattr__(self, attr: str) -> AtCoderProblem:
         return self.problems[attr]
