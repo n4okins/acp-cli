@@ -18,7 +18,7 @@ class AtCoderProblem(BaseModel):
     root_dir: Path = Path.cwd()
 
     def __str__(self) -> str:
-        return f"<AtCoderProblem {self.contest.name.upper()}-{self.difficulty} '{self.title}' - {self.point} [pts] ({self.url})>"
+        return f"<AtCoderProblem {self.contest.name.upper()} {('-' + self.difficulty + ' ') if self.difficulty else ''}'{self.title}' - {self.point} [pts] ({self.url})>"
 
 
 class AtCoderContest(BaseModel):

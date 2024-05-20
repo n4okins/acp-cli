@@ -1,10 +1,9 @@
 import argparse
 from pathlib import Path
 
-from acp.__version__ import __version__
 from acp.atcoder.service import AtCoder
-from acp.general.utils import confirm_yn_input
-from acp.service import AtCoderProblems
+from acp.core.__version__ import __version__
+from acp.core.service import AtCoderProblems
 
 
 def main():
@@ -36,11 +35,11 @@ def main():
         default=Path.cwd(),
         type=Path,
     )
-    oj_parsers = oj.add_subparsers(required=True)
+    oj_parsers = oj.add_subparsers(required=False)
     oj_d = oj_parsers.add_parser(
         "download",
         description="Download the test cases of the contest",
-        help="Require the URL of the contest",
+        help="Require the URL of the contest (default)",
         aliases=["d"],
     )
     oj_t = oj_parsers.add_parser(
@@ -104,19 +103,13 @@ def main():
     def oj_submit_hook(args) -> None:
         atc = AtCoderProblems().login_atcoder(args.directory)
         p = atc.get_problem(args.url)
-        if confirm_yn_input(
-            f"Submit the solution to {args.url} with {args.file}? [y/n] "
-        ):
-            atc.submit(p, submit_file=args.file, language_id=args.language)
+        atc.submit(p, submit_file=args.file, language_id=args.language)
 
     oj_d.set_defaults(func=oj_download_hook)
     oj_t.set_defaults(func=oj_test_hook)
     oj_s.set_defaults(func=oj_submit_hook)
 
-    def oj_hooks(args) -> None:
-        args.func(args)
-
-    oj.set_defaults(func=oj_hooks)
+    oj.set_defaults(func=oj_download_hook)
 
     d = subparsers.add_parser(
         "download",

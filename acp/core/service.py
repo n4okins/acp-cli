@@ -4,13 +4,13 @@ from pathlib import Path
 
 from acp.atcoder.models import AtCoderProblem
 from acp.atcoder.service import AtCoder
-from acp.general.service import WebService
-from acp.general.utils import confirm_yn_input, load_env
-from acp.models import (
+from acp.core.models import (
     AtCoderProblemsAPIResponse,
     AtCoderProblemsInnerProblem,
     AtCoderProblemsMetadata,
 )
+from acp.general.service import WebService
+from acp.general.utils import confirm_yn_input, load_env
 
 logger = getLogger(__name__)
 
@@ -194,7 +194,7 @@ class AtCoderProblems(WebService):
         target_dir = Path(target_dir)
         print(f"Download problems in {target_dir}")
         if confirm_yn_input(
-            "Do you want to download problems in this directory? [y/N]: "
+            "Do you want to download problems in this directory? [y/n]: "
         ):
             atcoder = self.login_atcoder(self.guess_cache_dir().parent)
 
@@ -216,7 +216,7 @@ class AtCoderProblems(WebService):
                 )
                 atcoder.download_problem(problem_data, problem_dir)
                 print(f"Downloaded {metadata.id} to {problem_dir}")
-                self.wait(0.25)
+                self.wait(0.1)
 
             root_dir = self.guess_cache_dir()  # キャッシュディレクトリの推測
             self.write_cache(
@@ -298,7 +298,7 @@ class AtCoderProblems(WebService):
             )
         target_problem = self.guess_problem(name, info_file)
         if confirm_yn_input(
-            f"Test {target_problem} in '{target_dir / target_problem.root_dir}'? [y/N]:"
+            f"Test {target_problem} in '{target_dir / target_problem.root_dir}'? [y/n]: "
         ):
             AtCoder().test(
                 target_problem,
@@ -344,14 +344,7 @@ class AtCoderProblems(WebService):
         print(
             f"language_id: {language_id} ({AtCoder._cache['lang'].get(language_id, 'Unknown')})"
         )
-        if confirm_yn_input(
-            f"Submit '{submit_file}' to {target_problem.name}? [y/N]: "
-        ):
-            atcoder = self.login_atcoder(root_dir)
-            print(f"Submit {submit_file} to {target_problem} ...")
-            atcoder.submit(
-                target_problem, submit_file=submit_file, language_id=language_id
-            )
-        else:
-            print("Abort submitting.")
-            return
+        atcoder = self.login_atcoder(root_dir)
+        atcoder.submit(
+            target_problem, submit_file=submit_file, language_id=language_id
+        )

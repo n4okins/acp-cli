@@ -9,7 +9,7 @@ from bs4 import BeautifulSoup
 from acp.atcoder.judge import JudgeResult, JudgeRunner
 from acp.atcoder.models import AtCoderContest, AtCoderProblem
 from acp.general.service import WebService
-from acp.general.utils import bg_color, color, reset_color
+from acp.general.utils import bg_color, color, confirm_yn_input, reset_color
 
 logger = getLogger(__name__)
 
@@ -346,7 +346,7 @@ class AtCoder(WebService):
         (target_dir / "out").mkdir(exist_ok=True, parents=True)
 
         self.get(problem.url)
-        self.wait(0.5)
+        self.wait(0.1)
 
         # Parse problem statement
         sample = re.compile(r"<h3>[入出]力例 \d+</h3><pre>([^<]+)[\n\r]</pre>").findall(
@@ -530,8 +530,14 @@ class AtCoder(WebService):
         if not submit_file.exists():
             # それでも存在しない場合はエラー
             raise FileNotFoundError(f"{submit_file} not found.")
-        
-        print(f"Submitting {submit_file} to {problem.name}...")
+
+        if not confirm_yn_input(
+            f"Submit the file {submit_file} to {problem.name}? [y/n] "
+        ):
+            print("Abort submitting.")
+            return
+
+        print("Submitting ...")
 
         submit_url = problem.contest.url + "/submit"
 
