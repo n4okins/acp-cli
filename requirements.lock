@@ -11,7 +11,7 @@
 annotated-types==0.6.0
     # via pydantic
 beautifulsoup4==4.12.3
-    # via acp
+    # via acp-cli
 certifi==2024.2.2
     # via requests
 charset-normalizer==3.3.2
@@ -19,13 +19,13 @@ charset-normalizer==3.3.2
 idna==3.7
     # via requests
 lxml==5.2.2
-    # via acp
+    # via acp-cli
 pydantic==2.7.1
-    # via acp
+    # via acp-cli
 pydantic-core==2.18.2
     # via pydantic
 requests==2.31.0
-    # via acp
+    # via acp-cli
 soupsieve==2.5
     # via beautifulsoup4
 typing-extensions==4.11.0

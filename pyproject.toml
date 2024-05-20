@@ -1,6 +1,6 @@
 [project]
-name = "acp"
-description = "Add your description here"
+name = "acp-cli"
+description = "AtCoder Problems CLI (non official)"
 authors = [
     { name = "n4okins", email = "63445867+n4okins@users.noreply.github.com" }
 ]

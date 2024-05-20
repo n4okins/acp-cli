@@ -4,10 +4,10 @@ A command line interface for AtCoder Problems.
 
 # Installation
 ```bash
-$ pip install git+https://github.com/n4okins/acp.git
+$ pip install git+https://github.com/n4okins/acp-cli.git
 ```
 ```bash
-$ rye install acp --git=https://github.com/n4okins/acp.git
+$ rye install acp --git=https://github.com/n4okins/acp-cli.git
 ```
 
 # Usage

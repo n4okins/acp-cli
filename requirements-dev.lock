@@ -11,7 +11,7 @@
 annotated-types==0.6.0
     # via pydantic
 beautifulsoup4==4.12.3
-    # via acp
+    # via acp-cli
 certifi==2024.2.2
     # via requests
 charset-normalizer==3.3.2
@@ -23,7 +23,7 @@ idna==3.7
 iniconfig==2.0.0
     # via pytest
 lxml==5.2.2
-    # via acp
+    # via acp-cli
 mypy==1.10.0
 mypy-extensions==1.0.0
     # via mypy
@@ -32,12 +32,12 @@ packaging==24.0
 pluggy==1.5.0
     # via pytest
 pydantic==2.7.1
-    # via acp
+    # via acp-cli
 pydantic-core==2.18.2
     # via pydantic
 pytest==8.2.0
 requests==2.31.0
-    # via acp
+    # via acp-cli
 ruff==0.4.4
 soupsieve==2.5
     # via beautifulsoup4
