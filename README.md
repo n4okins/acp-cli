@@ -222,8 +222,12 @@ Submitted successfully. Please check the results. (https://atcoder.jp/contests/t
 
 
 
-## Online-judge-tools互換？
-### AtCoderの問題のURLを直接指定して、ダウンロード・テスト・提出を行うことができます。
+# Online-judge-tools互換？
+## AtCoderの問題のURLを直接指定して、ダウンロード・テスト・提出を行うことができます。
+### この場合は、URLを常に指定する必要があります。
+`acp oj <AtCoder Problem URL> [d/t/s]` のように使うため、Pythonでの使用時はコマンド履歴を参照すると少しだけ楽になります。（最後の1文字を変更するだけで良いため）
+
+
 #### Download
 ```bash
 $ acp oj https://atcoder.jp/contests/typical90/tasks/typical90_a d

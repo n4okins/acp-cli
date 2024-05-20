@@ -5,6 +5,11 @@ from acp.atcoder.service import AtCoder
 from acp.core.__version__ import __version__
 from acp.core.service import AtCoderProblems
 
+# TODO: コンフィグファイルで設定できるようにする
+DEFAULT_EXEC_COMMAND = "python main.py"
+DEFAULT_SUBMIT_FILE = "main.py"
+DEFAULT_SUBMIT_LANG = 5055
+
 
 def main() -> None:
     parser = argparse.ArgumentParser("AtCoder Problems command line tools")
@@ -55,10 +60,10 @@ def main() -> None:
         help=(
             "Bind the command to test the solution. Tester will run"
             "`<Command> **/sample-*.in **/sample-*.out`)"
-            "ex: python main.py"
+            f"ex: {DEFAULT_EXEC_COMMAND}"
             "**/<Problem_DIR>/sample-*.in **/<Problem_DIR>/sample-*.out"
         ),
-        default="python main.py",
+        default=DEFAULT_EXEC_COMMAND,
     )
     oj_s = oj_parsers.add_parser(
         "submit",
@@ -71,7 +76,7 @@ def main() -> None:
         "-f",
         metavar="<File Path>",
         help="The file to submit",
-        default="main.py",
+        default=DEFAULT_SUBMIT_FILE,
         type=Path,
     )
     oj_s.add_argument(
@@ -79,7 +84,7 @@ def main() -> None:
         "-l",
         metavar="<Language ID>",
         help="The language ID of the file",
-        default="5055",
+        default=DEFAULT_SUBMIT_LANG,
         type=int,
     )
 
@@ -158,10 +163,10 @@ def main() -> None:
         help=(
             "Bind the command to test the solution. Tester will run"
             "`<Command> **/sample-*.in **/sample-*.out`)"
-            "ex: python main.py"
+            f"ex: {DEFAULT_EXEC_COMMAND}"
             "**/<Problem_DIR>/sample-*.in **/<Problem_DIR>/sample-*.out"
         ),
-        default="python main.py",
+        default=DEFAULT_EXEC_COMMAND,
     )
     t.add_argument(
         "--directory",
@@ -190,14 +195,14 @@ def main() -> None:
         "-f",
         metavar="<File Path>",
         help="The file to submit",
-        default="main.py",
+        default=DEFAULT_SUBMIT_FILE,
     )
     s.add_argument(
         "--language",
         "-l",
         metavar="<Language ID>",
         help="The language ID of the file",
-        default="5055",
+        default=DEFAULT_SUBMIT_LANG,
     )
     s.add_argument(
         "--directory",
@@ -249,71 +254,3 @@ def main() -> None:
 
     args = parser.parse_args()
     args.func(args)
-
-    # t = subparsers.add_parser(
-    #     "test",
-    #     description="Test the solution",
-    #     help="Require the file to test",
-    #     aliases=["t"],
-    # )
-    # t.add_argument(
-    #     "problem",
-    #     metavar="<Problem Index> OR <Problem ID>",
-    #     help="The problem index or ID to test. (ex: if the directory is '01-abc001_a', \
-    #         the problem index is '01' and the problem ID is 'abc001_a')",
-    # )
-    # t.add_argument(
-    #     "--skip-confirm",
-    #     dest="skip_confirm",
-    #     action="store_true",
-    #     help="Skip the confirmation",
-    # )
-    # t.add_argument(
-    #     "-y",
-    #     "--yes",
-    #     dest="skip_confirm",
-    #     action="store_true",
-    #     help="Skip the confirmation",
-    # )
-    # t.add_argument(
-    #     "--show-detail",
-    #     dest="show_detail",
-    #     action="store_true",
-    #     help="Show the detail of the test result",
-    # )
-    # t.add_argument(
-    #     "--bind-commands",
-    #     metavar="<Command>",
-    #     help=(
-    #         "Bind the command to test the solution. Tester will run"
-    #         "`<Command> **/sample-*.in **/sample-*.out`)"
-    #         "ex: python main.py"
-    #         "**/<Problem_DIR>/sample-*.in **/<Problem_DIR>/sample-*.out"
-    #     ),
-    #     default="python main.py",
-    # )
-
-    # def test_hook(args) -> None:
-    #     AtCoderProblems(args.url, args.directory).test(
-    #         args.problem,
-    #         args.bind_commands,
-    #         not_confirm=args.skip_confirm,
-    #         show_detail=args.show_detail,
-    #     )
-
-    # t.set_defaults(func=test_hook)
-
-    # d.set_defaults(func=download_hook)
-
-    # s = subparsers.add_parser(
-    #     "submit",
-    #     description="Submit the solution to the contest",
-    #     help="Require the file to submit",
-    #     aliases=["s"],
-    # )
-    # s.add_argument("file", metavar="<File Path>", help="The file to submit")
-
-    # def submit_hook(args) -> None:
-    #     AtCoderProblems(args.url).submit(args.file)
-
-    # s.set_defaults(func=submit_hook)
