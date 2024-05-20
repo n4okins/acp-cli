@@ -247,7 +247,7 @@ $ acp oj https://atcoder.jp/contests/typical90/tasks/typical90_a t
  sample-4   [ AC ]
 ---------------------------------------------
 ```
-#### Test (./a.out)
+#### Test (/path/to/typical90/typical90_a/a.out)
 ```bash
 $ acp oj https://atcoder.jp/contests/typical90/tasks/typical90_a t -c "./a.out"
 >> Testing the problem from https://atcoder.jp/contests/typical90/tasks/typical90_a. executing ./a.out on /path/to/typical90_a ...
@@ -262,7 +262,7 @@ $ acp oj https://atcoder.jp/contests/typical90/tasks/typical90_a t -c "./a.out"
  sample-4   [ AC ]
 ---------------------------------------------
 ```
-#### Submit (main.py, Python)
+#### Submit (/path/to/typical90/typical90_a/main.py, CPython 3.11.4)
 ```bash
 $ acp oj https://atcoder.jp/contests/typical90/tasks/typical90_a s
 >> Submit the solution to https://atcoder.jp/contests/typical90/tasks/typical90_a with main.py? [y/n] y
@@ -272,7 +272,7 @@ Submitting /path/to/typical90/typical90_a/main.py to typical90_a...
 正解 20XX-00-00 00:00:00+0900 | 001 - Yokan Party（★4） | <UserName> | Python (CPython 3.11.4) | 4 | 503 Byte | AC | 191 ms | 20724 KB
 Submitted successfully. Please check the results. (https://atcoder.jp/contests/typical90/submissions/me)
 ```
-#### Submit (./main.cpp, C++)
+#### Submit (/path/to/typical90/typical90_a/main.cpp, C++ 23 (gcc 12.2))
 ```bash
 $ acp oj https://atcoder.jp/contests/typical90/tasks/typical90_a s -l 5028 -f main.cpp
 >> Submit the solution to https://atcoder.jp/contests/typical90/tasks/typical90_a with main.cpp? [y/n] y
