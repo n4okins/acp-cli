@@ -27,7 +27,7 @@ class AtCoder(WebService):
     """
 
     _cache: dict = {
-        "submit": {},
+        "url": {},
         "lang": {
             5001: "C++ 20 (gcc 12.2)",
             5002: "Go (go 1.20.6)",
