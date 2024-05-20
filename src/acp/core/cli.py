@@ -6,7 +6,7 @@ from acp.core.__version__ import __version__
 from acp.core.service import AtCoderProblems
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser("AtCoder Problems command line tools")
     parser.add_argument(
         "--version",
@@ -83,7 +83,7 @@ def main():
         type=int,
     )
 
-    def oj_download_hook(args) -> None:
+    def oj_download_hook(args: argparse.Namespace) -> None:
         print(
             f"Downloading the problem from {args.url} into {args.directory / args.url.split('/')[-1]} ..."
         )
@@ -91,7 +91,7 @@ def main():
         p = atc.get_problem(args.url)
         atc.download_problem(p)
 
-    def oj_test_hook(args) -> None:
+    def oj_test_hook(args: argparse.Namespace) -> None:
         root = args.directory / args.url.split("/")[-1]
         print(
             f"Testing the problem from {args.url}. executing {args.command} on {root} ..."
@@ -100,7 +100,7 @@ def main():
         p = atc.get_problem(args.url)
         atc.test(p, command=args.command.split())
 
-    def oj_submit_hook(args) -> None:
+    def oj_submit_hook(args: argparse.Namespace) -> None:
         atc = AtCoderProblems().login_atcoder(args.directory)
         p = atc.get_problem(args.url)
         atc.submit(p, submit_file=args.file, language_id=args.language)
@@ -131,7 +131,7 @@ def main():
         default=Path.cwd(),
     )
 
-    def download_hook(args) -> None:
+    def download_hook(args: argparse.Namespace) -> None:
         contest = acp.get_contest(args.url)
         acp.download_problems(
             contest, Path(args.directory).resolve() / contest.info.title
@@ -171,7 +171,7 @@ def main():
         default=None,
     )
 
-    def test_hook(args) -> None:
+    def test_hook(args: argparse.Namespace) -> None:
         acp.test(args.problem, args.command.split(), args.directory)
 
     t.set_defaults(func=test_hook)
@@ -207,7 +207,7 @@ def main():
         default=None,
     )
 
-    def submit_hook(args) -> None:
+    def submit_hook(args: argparse.Namespace) -> None:
         acp.submit(
             args.problem,
             submit_file=args.file,
@@ -222,7 +222,7 @@ def main():
         description="Show the status of latest joined contests",
     )
 
-    def status_hook(args) -> None:
+    def status_hook(_: argparse.Namespace) -> None:
         cache = acp.read_cache(acp.guess_cache_dir())
         msg = ""
         if cache:
@@ -241,7 +241,7 @@ def main():
         description="Show the supported languages",
     )
 
-    def languages_hook(args) -> None:
+    def languages_hook(_: argparse.Namespace) -> None:
         for id_, lang in AtCoder._cache["lang"].items():
             print(f"ID: {id_} - {lang}")
 

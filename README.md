@@ -11,7 +11,6 @@ $ rye install acp --git=https://github.com/n4okins/acp-cli.git
 ```
 
 # Usage
-
 ### まず、AtCoderのユーザ名とパスワードを記載した.envファイルを作成してください。
 ```bash
 $ echo "ATCODER_USERNAME=<your_atcoder_username>" >> .env
@@ -277,3 +276,12 @@ Submitting /path/to/typical90/typical90_a/main.cpp to typical90_a...
 ジャッジ待ち 20XX-00-00 00:00:00+0900 | 001 - Yokan Party（★4） | <UserName> | C++ 23 (gcc 12.2) | 0 | 706 Byte | WJ
 ジャッジ中 20XX-00-00 00:00:00+0900 | 001 - Yokan Party（★4） | <UserName> | C++ 23 (gcc 12.2) | 0 | 706 Byte | 9/29
 正解 20XX-00-00 00:00:00+0900 | 001 - Yokan Party（★4） | <UserName> | C++ 23 (gcc 12.2) | 4 | 706 Byte | AC | 32 ms | 4312 KB
+
+```
+
+
+
+# Q&A
+### Q. `rye install acp --git=https://github.com/n4okins/acp-cli.git`でインストールしたが、`acp`コマンドが見つからない。
+A. `~/.rye/shims`に`acp`がインストールされるので、`~/.rye/shims`を`$PATH`に追加してください。
+

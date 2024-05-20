@@ -3,6 +3,7 @@ import subprocess
 import time
 from logging import getLogger
 from pathlib import Path
+from typing import Any
 
 logger = getLogger(__name__)
 
@@ -35,7 +36,7 @@ class JudgeRunner:
         Args:
             command (list[str]): 実行コマンド
             cd (Path | None, optional): 実行ディレクトリ. Defaults to None.
-        
+
         Examples:
             >>> runner = JudgeRunner(["python3", "main.py"], Path("contest"))
         """
@@ -81,7 +82,7 @@ class JudgeRunner:
         Args:
             output_testcase_file (Path): テストケース
             answer (str): 自分の答え
-        
+
         Returns:
             bool: 正解かどうか (True: 正解, False: 不正解)
         """
@@ -92,16 +93,16 @@ class JudgeRunner:
         input_testcase_file: Path,
         output_testcase_file: Path,
         timelimit: int = 2,
-    ) -> tuple[JudgeResult, dict]:
+    ) -> tuple[JudgeResult, dict[str, Any]]:
         """
         Args:
             input_testcase_file (Path): 入力ファイル
             output_testcase_file (Path): テストケース
             timelimit (int, optional): タイムアウト秒数. Defaults to 2.
-        
+
         Returns:
             tuple[JudgeResult, dict]: 判定結果, 実行結果
-            
+
         """
         start = time.perf_counter()
         answer, return_code, (stdout, stderr) = self.run(input_testcase_file)

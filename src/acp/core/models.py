@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from typing import Any
 
 
 class AtCoderProblemsInfo(BaseModel):
@@ -35,7 +36,7 @@ class AtCoderProblemsMetadata(BaseModel):
     title: str
     url: str = ""
 
-    def __init__(self, **data):
+    def __init__(self, **data: dict[str, Any]) -> None:
         super().__init__(**data)
         self.url = f"https://atcoder.jp/contests/{self.contest_id}/tasks/{self.id}"
 

@@ -32,10 +32,13 @@ dev-dependencies = [
 acp = "acp.core.cli:main"
 
 [tool.hatch.version]
-path = "acp/core/__version__.py"
+path = "src/acp/core/__version__.py"
 
 [tool.hatch.metadata]
 allow-direct-references = true
 
 [tool.hatch.build.targets.wheel]
-packages = ["acp"]
+packages = ["src/acp"]
+
+[tool.mypy]
+strict = true

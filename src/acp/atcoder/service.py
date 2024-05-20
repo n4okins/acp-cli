@@ -2,6 +2,7 @@ import re
 import weakref
 from logging import getLogger
 from pathlib import Path
+from typing import Any
 
 import bs4
 from bs4 import BeautifulSoup
@@ -26,7 +27,7 @@ class AtCoder(WebService):
     AtCoderの問題を取得するためのクラス
     """
 
-    _cache: dict = {
+    _cache: dict[str, dict[str | int, Any]] = {
         "url": {},
         "lang": {
             5001: "C++ 20 (gcc 12.2)",
@@ -147,11 +148,11 @@ class AtCoder(WebService):
     def get(  # type: ignore
         self,
         url: str,
-        params: dict = {},
-        headers: dict = {},
-        *args: tuple,
+        params: dict[str, str] = {},
+        headers: dict[str, str] = {},
+        *args: tuple[Any, ...],
         use_cache: bool = True,
-        **kwargs: dict,
+        **kwargs: dict[str, Any],
     ) -> BeautifulSoup:
         """
         getメソッド
@@ -189,10 +190,10 @@ class AtCoder(WebService):
     def post(  # type: ignore
         self,
         url: str,
-        params: dict = {},
-        headers: dict = {},
-        *args: tuple,
-        **kwargs: dict,
+        params: dict[str, str] = {},
+        headers: dict[str, str] = {},
+        *args: tuple[Any, ...],
+        **kwargs: dict[str, Any],
     ) -> BeautifulSoup:
         params.update({"lang": "ja"})  # 同上
         return super().post(url, *args, params=params, headers=headers, **kwargs)

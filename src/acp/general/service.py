@@ -1,6 +1,6 @@
 import time
 from logging import getLogger
-
+from typing import Any
 import requests
 import requests.cookies
 from bs4 import BeautifulSoup
@@ -53,7 +53,9 @@ class WebService:
     def soup(self) -> BeautifulSoup:
         return self._soup if self._soup else BeautifulSoup()
 
-    def get(self, url: str, *args: tuple, **kwargs: dict) -> BeautifulSoup:
+    def get(
+        self, url: str, *args: tuple[Any, ...], **kwargs: dict[str, Any]
+    ) -> BeautifulSoup:
         """
         getメソッド
         requests.getを実行し、BeautifulSoupオブジェクトを返す
@@ -77,7 +79,9 @@ class WebService:
         self._soup = BeautifulSoup(self.response.text, self.parser)
         return self.soup
 
-    def post(self, url: str, *args: tuple, **kwargs: dict) -> BeautifulSoup:
+    def post(
+        self, url: str, *args: tuple[Any, ...], **kwargs: dict[str, Any]
+    ) -> BeautifulSoup:
         """
         postメソッド
         requests.postを実行し、BeautifulSoupオブジェクトを返す
@@ -100,7 +104,7 @@ class WebService:
         self._soup = BeautifulSoup(self.response.text, self.parser)
         return self.soup
 
-    def login(self, data: dict) -> None:
+    def login(self, data: dict[Any, Any]) -> None:
         """
         ログイン処理とか
         """

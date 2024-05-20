@@ -1,6 +1,7 @@
 import json
 from logging import getLogger
 from pathlib import Path
+from typing import Any
 
 from acp.atcoder.models import AtCoderProblem
 from acp.atcoder.service import AtCoder
@@ -58,7 +59,7 @@ class AtCoderProblems(WebService):
         return atcoder_client
 
     def write_cache(
-        self, cache_dir: Path, data: dict, filename: Path | str = "cache.json"
+        self, cache_dir: Path, data: dict[str, Any], filename: Path | str = "cache.json"
     ) -> None:
         """
         キャッシュ(cache.json)にデータを書き込む
@@ -85,7 +86,7 @@ class AtCoderProblems(WebService):
                 indent=4,
             )
 
-    def read_cache(self, cache_dir: Path, filename: Path | str = "cache.json") -> dict:
+    def read_cache(self, cache_dir: Path, filename: Path | str = "cache.json") -> Any:
         """
         キャッシュ(cache.json)を読み込む
 
@@ -152,9 +153,11 @@ class AtCoderProblems(WebService):
             "#/contest/show", "internal-api/contest/get"
         )  # APIのURLに変換
         self.get(url)
-        data = self.response.json()
-        data["problems"] = [AtCoderProblemsInnerProblem(**x) for x in data["problems"]]
-        data = AtCoderProblemsAPIResponse(**data)
+        json_data = self.response.json()
+        json_data["problems"] = [
+            AtCoderProblemsInnerProblem(**x) for x in json_data["problems"]
+        ]
+        data = AtCoderProblemsAPIResponse(**json_data)
 
         print("=" * 40 + f" Virtual Contest: {data.info.title} " + "=" * 40)
         max_name_length = max(
@@ -172,7 +175,6 @@ class AtCoderProblems(WebService):
                 f"{i:02d} | {problem.id + (' ' * (max_name_length - len(problem.id)))} - {metadata.name + (' ' * (max_title_length - len(metadata.title)))} | {metadata.url}"
             )
         print("=" * (40 * 2 + len(f" Virtual Contest: {data.info.title} ")))
-
         return data
 
     def download_problems(
@@ -284,25 +286,25 @@ class AtCoderProblems(WebService):
         cache_path = self.guess_cache_dir()
         root_dir = cache_path.parent
         cache = self.read_cache(cache_path)
-        target_dir = target_dir or root_dir / cache["target_dir"]
-        target_dir = Path(target_dir)
-        if not target_dir.exists():
+        directory = root_dir / cache["target_dir"] if target_dir is None else target_dir
+        directory = Path(directory)
+        if not directory.exists():
             raise self.AtCoderProblemsExceptions.ProblemsNotFoundError(
-                f"Failed to find problems in {target_dir}"
+                f"Failed to find problems in {directory}"
             )
 
-        info_file = target_dir / "info.json"
+        info_file = directory / "info.json"
         if not info_file.exists():
             raise self.AtCoderProblemsExceptions.ProblemsNotFoundError(
-                f"Failed to find problems in {target_dir}"
+                f"Failed to find problems in {directory}"
             )
         target_problem = self.guess_problem(name, info_file)
         if confirm_yn_input(
-            f"Test {target_problem} in '{target_dir / target_problem.root_dir}'? [y/n]: "
+            f"Test {target_problem} in '{directory / target_problem.root_dir}'? [y/n]: "
         ):
             AtCoder().test(
                 target_problem,
-                target_dir=target_dir / target_problem.root_dir,
+                target_dir=directory / target_problem.root_dir,
                 command=command,
             )
         else:
@@ -327,24 +329,22 @@ class AtCoderProblems(WebService):
                     break
 
         cache = self.read_cache(cache_path)
-        target_dir = target_dir or root_dir / cache["target_dir"]
-        target_dir = Path(target_dir)
-        if not target_dir.exists():
+        directory = target_dir or root_dir / cache["target_dir"]
+        directory = Path(directory)
+        if not directory.exists():
             raise self.AtCoderProblemsExceptions.ProblemsNotFoundError(
-                f"Failed to find problems in {target_dir}"
+                f"Failed to find problems in {directory}"
             )
 
-        info_file = target_dir / "info.json"
+        info_file = directory / "info.json"
         if not info_file.exists():
             raise self.AtCoderProblemsExceptions.ProblemsNotFoundError(
-                f"Failed to find problems in {target_dir}"
+                f"Failed to find problems in {directory}"
             )
         target_problem = self.guess_problem(name, info_file)
-        submit_file = target_dir / target_problem.root_dir / submit_file
+        submit_file = directory / target_problem.root_dir / submit_file
         print(
             f"language_id: {language_id} ({AtCoder._cache['lang'].get(language_id, 'Unknown')})"
         )
         atcoder = self.login_atcoder(root_dir)
-        atcoder.submit(
-            target_problem, submit_file=submit_file, language_id=language_id
-        )
+        atcoder.submit(target_problem, submit_file=submit_file, language_id=language_id)
