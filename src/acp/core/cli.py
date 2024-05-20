@@ -97,10 +97,6 @@ def main() -> None:
         atc.download_problem(p)
 
     def oj_test_hook(args: argparse.Namespace) -> None:
-        root = args.directory / args.url.split("/")[-1]
-        print(
-            f"Testing the problem from {args.url}. executing {args.command} on {root} ..."
-        )
         atc = AtCoderProblems().login_atcoder(args.directory)
         p = atc.get_problem(args.url)
         atc.test(p, command=args.command.split())

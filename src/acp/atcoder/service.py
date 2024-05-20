@@ -531,7 +531,9 @@ class AtCoder(WebService):
         if not submit_file.exists():
             # それでも存在しない場合はエラー
             raise FileNotFoundError(f"{submit_file} not found.")
-
+        print(
+            f"language_id: {language_id} ({AtCoder._cache['lang'].get(language_id, 'Unknown')})"
+        )
         if not confirm_yn_input(
             f"Submit the file {submit_file} to {problem.name}? [y/n] "
         ):

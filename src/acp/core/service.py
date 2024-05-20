@@ -299,17 +299,12 @@ class AtCoderProblems(WebService):
                 f"Failed to find problems in {directory}"
             )
         target_problem = self.guess_problem(name, info_file)
-        if confirm_yn_input(
-            f"Test {target_problem} in '{directory / target_problem.root_dir}'? [y/n]: "
-        ):
-            AtCoder().test(
-                target_problem,
-                target_dir=directory / target_problem.root_dir,
-                command=command,
-            )
-        else:
-            print("Abort testing.")
-            return
+
+        AtCoder().test(
+            target_problem,
+            target_dir=directory / target_problem.root_dir,
+            command=command,
+        )
 
     def submit(
         self,
@@ -343,8 +338,5 @@ class AtCoderProblems(WebService):
             )
         target_problem = self.guess_problem(name, info_file)
         submit_file = directory / target_problem.root_dir / submit_file
-        print(
-            f"language_id: {language_id} ({AtCoder._cache['lang'].get(language_id, 'Unknown')})"
-        )
         atcoder = self.login_atcoder(root_dir)
         atcoder.submit(target_problem, submit_file=submit_file, language_id=language_id)
