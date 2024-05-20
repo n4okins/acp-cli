@@ -530,6 +530,8 @@ class AtCoder(WebService):
         if not submit_file.exists():
             # それでも存在しない場合はエラー
             raise FileNotFoundError(f"{submit_file} not found.")
+        
+        print(f"Submitting {submit_file} to {problem.name}...")
 
         submit_url = problem.contest.url + "/submit"
 

@@ -222,3 +222,58 @@ Submitted successfully. Please check the results. (https://atcoder.jp/contests/t
 この例では、`/path/to/典型90問 難易度順/00-typical90_d/main.cpp`を、`C++ 23 (gcc 12.2)`で提出しています。
 
 
+
+## Online-judge-tools互換？
+### AtCoderの問題のURLを直接指定して、ダウンロード・テスト・提出を行うことができます。
+#### Download
+```bash
+$ acp oj https://atcoder.jp/contests/typical90/tasks/typical90_a d
+```
+#### Test (python main.py)
+```bash
+$ acp oj https://atcoder.jp/contests/typical90/tasks/typical90_a t
+>> Testing the problem from https://atcoder.jp/contests/typical90/tasks/typical90_a. executing python main.py on /path/to/typical90_a ...
+---------------- typical90_a ----------------
+- Execute Directory:  '/path/to/typical90/typical90_a'
+- Execute Command:    "python main.py"
+---------------------------------------------
+ sample-0   [ AC ]
+ sample-1   [ AC ]
+ sample-2   [ AC ]
+ sample-3   [ AC ]
+ sample-4   [ AC ]
+---------------------------------------------
+```
+#### Test (./a.out)
+```bash
+$ acp oj https://atcoder.jp/contests/typical90/tasks/typical90_a t -c "./a.out"
+>> Testing the problem from https://atcoder.jp/contests/typical90/tasks/typical90_a. executing ./a.out on /path/to/typical90_a ...
+---------------- typical90_a ----------------
+- Execute Directory:  '/path/to/typical90/typical90_a'
+- Execute Command:    "./a.out"
+---------------------------------------------
+ sample-0   [ AC ]
+ sample-1   [ AC ]
+ sample-2   [ AC ]
+ sample-3   [ AC ]
+ sample-4   [ AC ]
+---------------------------------------------
+```
+#### Submit (main.py, Python)
+```bash
+$ acp oj https://atcoder.jp/contests/typical90/tasks/typical90_a s
+>> Submit the solution to https://atcoder.jp/contests/typical90/tasks/typical90_a with main.py? [y/n] y
+Submitting /path/to/typical90/typical90_a/main.py to typical90_a...
+ジャッジ待ち 20XX-00-00 00:00:00+0900 | 001 - Yokan Party（★4） | <UserName> | Python (CPython 3.11.4) | 0 | 503 Byte | WJ
+ジャッジ中 20XX-00-00 00:00:00+0900 | 001 - Yokan Party（★4） | <UserName> | Python (CPython 3.11.4) | 0 | 503 Byte | 14/29
+正解 20XX-00-00 00:00:00+0900 | 001 - Yokan Party（★4） | <UserName> | Python (CPython 3.11.4) | 4 | 503 Byte | AC | 191 ms | 20724 KB
+Submitted successfully. Please check the results. (https://atcoder.jp/contests/typical90/submissions/me)
+```
+#### Submit (./main.cpp, C++)
+```bash
+$ acp oj https://atcoder.jp/contests/typical90/tasks/typical90_a s -l 5028 -f main.cpp
+>> Submit the solution to https://atcoder.jp/contests/typical90/tasks/typical90_a with main.cpp? [y/n] y
+Submitting /path/to/typical90/typical90_a/main.cpp to typical90_a...
+ジャッジ待ち 20XX-00-00 00:00:00+0900 | 001 - Yokan Party（★4） | <UserName> | C++ 23 (gcc 12.2) | 0 | 706 Byte | WJ
+ジャッジ中 20XX-00-00 00:00:00+0900 | 001 - Yokan Party（★4） | <UserName> | C++ 23 (gcc 12.2) | 0 | 706 Byte | 9/29
+正解 20XX-00-00 00:00:00+0900 | 001 - Yokan Party（★4） | <UserName> | C++ 23 (gcc 12.2) | 4 | 706 Byte | AC | 32 ms | 4312 KB
