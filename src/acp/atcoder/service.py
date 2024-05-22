@@ -1,4 +1,5 @@
 import re
+import subprocess
 import weakref
 from logging import getLogger
 from pathlib import Path
@@ -242,7 +243,7 @@ class AtCoder(WebService):
                 pass
         if self.is_logged_in:
             return
-        logger.info("Logging in...")
+        print("Logging in...")
         logger.info("Username: %s", username)
         logger.info("Password: %s", "*" * len(password))
         res = self.get(self.URLs.LOGIN, use_cache=False)
@@ -392,6 +393,42 @@ class AtCoder(WebService):
         """
         for problem in contest.problems.values():
             self.download_problem(problem)  # 問題ごとにダウンロード
+
+    def run(
+        self,
+        problem: AtCoderProblem,
+        *,
+        target_dir: Path | str | None = None,
+        command: list[str] = ["python", "main.py"],
+    ) -> None:
+        """
+        AtCoderの問題を実行する
+
+        Args:
+            problem (AtCoderProblem): 問題
+            target_dir (Path | str | None, optional): テストするディレクトリ. Defaults to None.
+            command (list[str], optional): 実行コマンド. Defaults to ["python", "main.py"].
+
+        Examples:
+            >>> atcoder.test(problem)  # test in the problem's root directory
+            >>> atcoder.test(problem, target_dir="contest")  # test in the "contest" directory
+            >>> atcoder.test(problem, command=["python3", "main.py"])  # test with the command "python3 main.py"
+        """
+        target_dir = (
+            Path(target_dir)
+            if isinstance(target_dir, str)
+            else target_dir or problem.root_dir
+        )  # 実行するディレクトリ
+
+        proc = subprocess.Popen(
+            command,
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            cwd=target_dir,
+        )
+        stdout, stderr = proc.communicate(input=input().encode(), timeout=10)
+        print(stdout.decode())
 
     def test(
         self,

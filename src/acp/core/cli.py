@@ -47,6 +47,20 @@ def main() -> None:
         help="Require the URL of the contest (default)",
         aliases=["d"],
     )
+    oj_r = oj_parsers.add_parser(
+        "run", description="run the command", help="run", aliases=["r"]
+    )
+    oj_r.add_argument(
+        "--command",
+        "-c",
+        metavar="<Command>",
+        help=(
+            "Bind the command to running the solution. That will run"
+            "`<Command>`, You can input some texts."
+            f"ex: {DEFAULT_EXEC_COMMAND}"
+        ),
+        default=DEFAULT_EXEC_COMMAND,
+    )
     oj_t = oj_parsers.add_parser(
         "test",
         description="Test the solution",
@@ -100,6 +114,11 @@ def main() -> None:
         atc = AtCoderProblems().login_atcoder(args.directory)
         p = atc.get_problem(args.url)
         atc.test(p, command=args.command.split())
+    
+    def oj_run_hook(args: argparse.Namespace) -> None:
+        atc = AtCoderProblems().login_atcoder(args.directory)
+        p = atc.get_problem(args.url)
+        atc.run(p, command=args.command.split())
 
     def oj_submit_hook(args: argparse.Namespace) -> None:
         atc = AtCoderProblems().login_atcoder(args.directory)
@@ -107,6 +126,7 @@ def main() -> None:
         atc.submit(p, submit_file=args.file, language_id=args.language)
 
     oj_d.set_defaults(func=oj_download_hook)
+    oj_r.set_defaults(func=oj_run_hook)
     oj_t.set_defaults(func=oj_test_hook)
     oj_s.set_defaults(func=oj_submit_hook)
 
@@ -139,6 +159,44 @@ def main() -> None:
         )
 
     d.set_defaults(func=download_hook)
+
+    r = subparsers.add_parser(
+        "run",
+        description="Run the solution",
+        help="Require the file to test",
+        aliases=["r"],
+    )
+    r.add_argument(
+        "problem",
+        metavar="<Problem Index> OR <Problem ID>",
+        help=" (Allow ambiguous input)\n  The problem index or ID to test. (ex: if the directory is '01-abc001_a', \
+            the problem index is '01' and the problem ID is 'abc001_a')",
+    )
+    r.add_argument(
+        "--command",
+        "-c",
+        metavar="<Command>",
+        help=(
+            "Bind the command to test the solution. Tester will run"
+            "`<Command> **/sample-*.in **/sample-*.out`)"
+            f"ex: {DEFAULT_EXEC_COMMAND}"
+            "**/<Problem_DIR>/sample-*.in **/<Problem_DIR>/sample-*.out"
+        ),
+        default=DEFAULT_EXEC_COMMAND,
+    )
+    r.add_argument(
+        "--directory",
+        "-d",
+        metavar="<Directory Path>",
+        help="The directory of the contest",
+        default=None,
+    )
+
+    def run_hook(args: argparse.Namespace) -> None:
+        acp.run(args.problem, args.command.split(), args.directory)
+
+    r.set_defaults(func=run_hook)
+
 
     t = subparsers.add_parser(
         "test",

@@ -34,6 +34,14 @@ class AtCoderProblems(WebService):
 
     def __init__(self, parser: str = "lxml", session_dir: Path | None = None) -> None:
         session_dir = session_dir or Path.cwd() / ".acp"
+        if not session_dir.exists():
+            for p in session_dir.parents:
+                s = p / ".acp"
+                if s.exists():
+                    session_dir = s
+                    break
+
+        print(session_dir)
         super().__init__(parser, session_dir=session_dir)
         self.problems_metadata: dict[str, AtCoderProblemsMetadata] = {}
 
@@ -42,6 +50,10 @@ class AtCoderProblems(WebService):
         AtCoderにログインする
         """
         atcoder_client = AtCoder(session_dir=self._session_dir)
+
+        if atcoder_client.is_logged_in:
+            return atcoder_client
+
         try:
             env = load_env(root_dir / ".env")
         except FileNotFoundError:
@@ -278,6 +290,32 @@ class AtCoderProblems(WebService):
 
             return AtCoderProblem(**problem_data)
 
+    def run(
+        self,
+        name: str,
+        command: list[str] = ["python", "main.py"],
+        target_dir: Path | str | None = None,
+    ) -> None:
+        cache_path = self.guess_cache_dir()
+        root_dir = cache_path.parent
+        cache = self.read_cache(cache_path)
+        directory = root_dir / cache["target_dir"] if target_dir is None else target_dir
+        directory = Path(directory)
+        if not directory.exists():
+            raise self.AtCoderProblemsExceptions.ProblemsNotFoundError(
+                f"Failed to find problems in {directory}"
+            )
+
+        info_file = directory / "info.json"
+        if not info_file.exists():
+            raise self.AtCoderProblemsExceptions.ProblemsNotFoundError(
+                f"Failed to find problems in {directory}"
+            )
+        target_problem = self.guess_problem(name, info_file)
+        self.login_atcoder(root_dir).run(
+            problem=target_problem, target_dir=target_dir, command=command
+        )
+
     def test(
         self,
         name: str,
@@ -301,7 +339,7 @@ class AtCoderProblems(WebService):
             )
         target_problem = self.guess_problem(name, info_file)
 
-        AtCoder().test(
+        self.login_atcoder(root_dir).test(
             target_problem,
             target_dir=directory / target_problem.root_dir,
             command=command,
