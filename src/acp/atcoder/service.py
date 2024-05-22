@@ -10,7 +10,13 @@ from bs4 import BeautifulSoup
 from acp.atcoder.judge import JudgeResult, JudgeRunner
 from acp.atcoder.models import AtCoderContest, AtCoderProblem
 from acp.general.service import WebService
-from acp.general.utils import bg_color, color, confirm_yn_input, reset_color
+from acp.general.utils import (
+    add_gitignore,
+    bg_color,
+    color,
+    confirm_yn_input,
+    reset_color,
+)
 
 logger = getLogger(__name__)
 
@@ -145,6 +151,12 @@ class AtCoder(WebService):
     class AtCoderExceptions(WebService.Exceptions):
         pass
 
+    def __init__(self, parser: str = "lxml", session_dir: Path | None = None) -> None:
+        session_dir = session_dir or Path.cwd() / ".ac"
+        super().__init__(parser, session_dir)
+        add_gitignore([".env", session_dir.name])
+        self.session_path = self._session_dir / "atcoder.jp.session"
+
     def get(  # type: ignore
         self,
         url: str,
@@ -222,6 +234,12 @@ class AtCoder(WebService):
         return self._session.get(self.URLs.SETTINGS).url == self.URLs.SETTINGS
 
     def login(self, username: str, password: str) -> None:  # type: ignore
+        if self.session_path.exists():
+            try:
+                self.load_session(self.session_path)
+                print("Load session.")
+            except Exception:
+                pass
         if self.is_logged_in:
             return
         logger.info("Logging in...")
@@ -241,6 +259,8 @@ class AtCoder(WebService):
             self.URLs.LOGIN,
             data=data,
         )
+
+        self.save_session(self.session_path)
         self.wait(0.5)  # 0.5秒待機
 
         if self.alerts["danger"]:
@@ -474,7 +494,7 @@ class AtCoder(WebService):
                     + reset_color()
                 )
             lines.append(line)
-        
+
         lines[-1].strip()
         lines.append(
             bg_color(32, 32, 32)

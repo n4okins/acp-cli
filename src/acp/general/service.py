@@ -1,6 +1,9 @@
+import pickle
 import time
 from logging import getLogger
+from pathlib import Path
 from typing import Any
+
 import requests
 import requests.cookies
 from bs4 import BeautifulSoup
@@ -28,11 +31,13 @@ class WebService:
         class ProblemsNotFoundError(Exception):
             pass
 
-    def __init__(self, parser: str = "lxml") -> None:
+    def __init__(self, parser: str = "lxml", session_dir: Path | None = None) -> None:
         self._session: requests.Session = requests.Session()
         self._response: requests.Response | None = None
         self._soup: BeautifulSoup | None = None
+        self._session_dir = session_dir or (Path.cwd() / ".session")
         self.parser = parser
+        self._session_dir.mkdir(parents=True, exist_ok=True)
 
     def wait(self, seconds: float) -> None:
         time.sleep(seconds)
@@ -113,3 +118,13 @@ class WebService:
     @property
     def cookies(self) -> requests.cookies.RequestsCookieJar:
         return self._session.cookies
+
+    def save_session(self, file_path: Path | None = None) -> None:
+        file_path = file_path or (self._session_dir / "websession")
+        with file_path.open("wb") as f:
+            pickle.dump(self.cookies, f)
+
+    def load_session(self, file_path: Path | None = None) -> None:
+        file_path = file_path or (self._session_dir / "websession")
+        with file_path.open("rb") as f:
+            self.cookies.update(pickle.load(f))

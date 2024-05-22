@@ -32,15 +32,16 @@ class AtCoderProblems(WebService):
         class AmbiguousProblemError(Exception):
             pass
 
-    def __init__(self, parser: str = "lxml") -> None:
-        super().__init__(parser)
+    def __init__(self, parser: str = "lxml", session_dir: Path | None = None) -> None:
+        session_dir = session_dir or Path.cwd() / ".acp"
+        super().__init__(parser, session_dir=session_dir)
         self.problems_metadata: dict[str, AtCoderProblemsMetadata] = {}
 
     def login_atcoder(self, root_dir: Path) -> AtCoder:
         """
         AtCoderにログインする
         """
-        atcoder_client = AtCoder()
+        atcoder_client = AtCoder(session_dir=self._session_dir)
         try:
             env = load_env(root_dir / ".env")
         except FileNotFoundError:
