@@ -238,12 +238,12 @@ class AtCoder(WebService):
         if self.session_path.exists():
             try:
                 self.load_session(self.session_path)
-                print("Load session.")
+                # print("Load session.")
             except Exception:
                 pass
         if self.is_logged_in:
             return
-        print("Logging in...")
+        # print("Logging in...")
         logger.info("Username: %s", username)
         logger.info("Password: %s", "*" * len(password))
         res = self.get(self.URLs.LOGIN, use_cache=False)
@@ -420,6 +420,21 @@ class AtCoder(WebService):
             else target_dir or problem.root_dir
         )  # 実行するディレクトリ
 
+        print(
+            color(255, 255, 255)
+            + "-" * 32
+            + " "
+            + problem.name
+            + " "
+            + "-" * 32
+            + f"\n- Execute Directory:  '{target_dir}'\n"
+            + '- Execute Command:    "'
+            + " ".join(command)
+            + '"\n'
+            + "  Waiting input ...\n"
+            + "-" * (len(problem.name) + 66)
+            + reset_color()
+        )
         proc = subprocess.Popen(
             command,
             stdin=subprocess.PIPE,
@@ -429,6 +444,14 @@ class AtCoder(WebService):
         )
         stdout, stderr = proc.communicate(input=input().encode(), timeout=10)
         print(stdout.decode())
+        if stderr:
+            print(
+                bg_color(64, 64, 32)
+                + color(255, 255, 255)
+                + "\nRuntime Error:\n"
+                + stderr.decode().strip()
+                + reset_color()
+            )
 
     def test(
         self,

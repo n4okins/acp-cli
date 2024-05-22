@@ -41,7 +41,6 @@ class AtCoderProblems(WebService):
                     session_dir = s
                     break
 
-        print(session_dir)
         super().__init__(parser, session_dir=session_dir)
         self.problems_metadata: dict[str, AtCoderProblemsMetadata] = {}
 
@@ -313,7 +312,9 @@ class AtCoderProblems(WebService):
             )
         target_problem = self.guess_problem(name, info_file)
         self.login_atcoder(root_dir).run(
-            problem=target_problem, target_dir=target_dir, command=command
+            problem=target_problem,
+            target_dir=directory / target_problem.root_dir,
+            command=command,
         )
 
     def test(
