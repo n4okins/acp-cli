@@ -440,16 +440,24 @@ class AtCoder(WebService):
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-            cwd=target_dir,
+            cwd=target_dir
         )
-        stdout, stderr = proc.communicate(input=input().encode(), timeout=10)
-        print(stdout.decode())
+        stdout, stderr = proc.communicate(input=("\n".join(iter(input, "")).encode()))
+        stdout, stderr = stdout.decode(), stderr.decode()
+        if stdout:
+            print(
+                bg_color(32, 64, 32)
+                + color(255, 255, 255)
+                + "\nOutput:\n"
+                + stdout.strip()
+                + reset_color()
+            )
         if stderr:
             print(
                 bg_color(64, 64, 32)
                 + color(255, 255, 255)
                 + "\nRuntime Error:\n"
-                + stderr.decode().strip()
+                + stderr.strip()
                 + reset_color()
             )
 
