@@ -405,16 +405,16 @@ class AtCoder(WebService):
         lines = []
         lines.append(
             color(255, 255, 255)
-            + "-" * 16
+            + "-" * 32
             + " "
             + problem.name
             + " "
-            + "-" * 16
+            + "-" * 32
             + f"\n- Execute Directory:  '{target_dir}'\n"
             + '- Execute Command:    "'
             + " ".join(command)
             + '"\n'
-            + "-" * (len(problem.name) + 34)
+            + "-" * (len(problem.name) + 66)
             + reset_color()
         )
         colormap = {
@@ -445,11 +445,12 @@ class AtCoder(WebService):
                 + "]"
                 + reset_color()
             )
-            if code == JudgeResult.WA:
+            if code == JudgeResult.AC:
+                line += f"  time: {meta['time']:.2f} [sec]"
+            elif code == JudgeResult.WA:
                 out = (target_dir / "out" / f"sample-{i}.out").read_text().strip()
                 line += (
-                    "\n"
-                    + bg_color(32, 64, 32)
+                    bg_color(32, 64, 32)
                     + color(255, 255, 255)
                     + "\nExpected:\n"
                     + out
@@ -459,11 +460,12 @@ class AtCoder(WebService):
                     + "\nGot:\n"
                     + meta["stdout"].strip()
                     + reset_color()
+                    + "\n"
                 )
             elif code == JudgeResult.RE:
                 err = meta["stderr"].strip()
                 line += f" return code: {meta['return_code']}" + (
-                    ("\n" + bg_color(64, 64, 32) + err + reset_color()) if err else ""
+                    (bg_color(64, 64, 32) + err + reset_color()) if err else ""
                 )
             elif code == JudgeResult.TLE:
                 line += (
@@ -472,14 +474,14 @@ class AtCoder(WebService):
                     + reset_color()
                 )
             lines.append(line)
+        
+        lines[-1].strip()
         lines.append(
             bg_color(32, 32, 32)
             + color(255, 255, 255)
-            + "-" * (len(problem.name) + 34)
+            + "-" * (len(problem.name) + 64 + 2)
             + reset_color()
         )
-        lines[-1].strip()
-
         for line in lines:
             print(line)
 
