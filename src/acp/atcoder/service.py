@@ -440,10 +440,10 @@ class AtCoder(WebService):
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-            cwd=target_dir
+            cwd=target_dir,
         )
-        stdout, stderr = proc.communicate(input=("\n".join(iter(input, "")).encode()))
-        stdout, stderr = stdout.decode(), stderr.decode()
+        bstdout, bstderr = proc.communicate(input=("\n".join(iter(input, "")).encode()))
+        stdout, stderr = bstdout.decode(), bstderr.decode()
         if stdout:
             print(
                 bg_color(32, 64, 32)

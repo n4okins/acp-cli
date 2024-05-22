@@ -114,7 +114,7 @@ def main() -> None:
         atc = AtCoderProblems().login_atcoder(args.directory)
         p = atc.get_problem(args.url)
         atc.test(p, command=args.command.split())
-    
+
     def oj_run_hook(args: argparse.Namespace) -> None:
         atc = AtCoderProblems().login_atcoder(args.directory)
         p = atc.get_problem(args.url)
@@ -196,7 +196,6 @@ def main() -> None:
         acp.run(args.problem, args.command.split(), args.directory)
 
     r.set_defaults(func=run_hook)
-
 
     t = subparsers.add_parser(
         "test",
