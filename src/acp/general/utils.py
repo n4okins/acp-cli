@@ -38,6 +38,33 @@ def load_env(path: Path | None = None) -> dict[str, str]:
     return env  # .envの内容を返す
 
 
+def add_gitignore(items: list[str], root: Path | None = None) -> None:
+    root = root or Path.cwd()
+    gitignore = root / ".gitignore"
+    if not gitignore.exists():
+        for p in root.parents:
+            gitignore = p / ".gitignore"
+            if gitignore.exists():
+                break
+        else:
+            gitignore = root / ".gitignore"
+
+    newfile = False
+    if not gitignore.exists():
+        newfile = True
+        gitignore.touch()
+
+    with gitignore.open("r") as f:
+        for item in f:
+            item = item.strip()
+            if item in items:
+                del items[items.index(item)]
+
+    if items:
+        with gitignore.open("a") as f:
+            f.write(("" if newfile else "\n") + "\n".join(items))
+
+
 class HttpStatusCode(Enum):
     """
     HTTPステータスコード
