@@ -167,6 +167,18 @@ Test <AtCoderProblem TYPICAL90- 'Cross Sum（★2）' - 0 [pts] (https://atcoder
 ---------------------------------------------
 ```
 
+## Run your code
+```bash
+$ acp r <problem_key>
+```
+`acp r`コマンドでプログラムの実行が可能です。
+`<problem_key>`には問題のキーを指定してください。
+
+デフォルトではPythonが実行されます。
+実行後、任意の入力を受け付け、出力を表示します。
+
+
+
 ## Submit your code
 ```bash
 $ acp s <problem_key>
