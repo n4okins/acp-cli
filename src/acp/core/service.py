@@ -1,6 +1,6 @@
+import getpass
 import json
 import os
-import getpass
 from logging import getLogger
 from pathlib import Path
 from typing import Any
@@ -13,7 +13,9 @@ from acp.core.models import (
     AtCoderProblemsMetadata,
 )
 from acp.general.service import WebService
-from acp.general.utils import confirm_yn_input, load_env
+from acp.general.utils import confirm_yn_input
+
+# from acp.general.utils import load_env
 
 logger = getLogger(__name__)
 
@@ -73,13 +75,15 @@ class AtCoderProblems(WebService):
         for _ in range(retry_count):
             try:
                 username = env.get("ATCODER_USERNAME", input("AtCoder Username: "))
-                password = env.get("ATCODER_PASSWORD", getpass.getpass("AtCoder Password: "))
+                password = env.get(
+                    "ATCODER_PASSWORD", getpass.getpass("AtCoder Password: ")
+                )
                 atcoder_client.login(username=username, password=password)
 
             except atcoder_client.Exceptions.LoginFailedError:
                 self.wait(2)
                 print("Failed to login. Please try again.")
-            
+
             if atcoder_client.is_logged_in:
                 break
 
