@@ -15,10 +15,8 @@ tmp/
 .env
 .vscode/
 
-.acp
 contests/
-*.in
-*.out
 pytest*.*
 
 main.py
+.acp

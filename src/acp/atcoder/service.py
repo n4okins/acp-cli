@@ -157,6 +157,7 @@ class AtCoder(WebService):
         super().__init__(parser, session_dir)
         add_gitignore([".env", session_dir.name])
         self.session_path = self._session_dir / "atcoder.jp.session"
+        self.load_session(self.session_path)
 
     def get(  # type: ignore
         self,
@@ -235,12 +236,6 @@ class AtCoder(WebService):
         return self._session.get(self.URLs.SETTINGS).url == self.URLs.SETTINGS
 
     def login(self, username: str, password: str) -> None:  # type: ignore
-        if self.session_path.exists():
-            try:
-                self.load_session(self.session_path)
-                # print("Load session.")
-            except Exception:
-                pass
         if self.is_logged_in:
             return
         # print("Logging in...")
@@ -267,7 +262,7 @@ class AtCoder(WebService):
         if self.alerts["danger"]:
             raise self.AtCoderExceptions.LoginFailedError(
                 self.alerts["danger"]
-            )  # ログイン失敗時のエラー
+            )  # ログイン失敗時はraise
         if self.alerts["warning"]:
             logger.warning("Alerts: %s", self.alerts["warning"])
         if self.alerts["info"]:
@@ -660,7 +655,9 @@ class AtCoder(WebService):
             judge = latest.find("span", class_="label").attrs["title"]  # type: ignore
             status = [
                 td.text.strip() for td in latest.find_all("tr")[1].find_all("td")
-            ][:-1]  # 提出結果の列を取得
+            ][
+                :-1
+            ]  # 提出結果の列を取得
             print(judge, " | ".join(status))
             if judge not in ["ジャッジ待ち", "ジャッジ中"]:
                 print(

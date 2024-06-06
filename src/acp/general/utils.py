@@ -61,6 +61,7 @@ def add_gitignore(items: list[str], root: Path | None = None) -> None:
                 del items[items.index(item)]
 
     if items:
+        print(f"Automatically add the following items {items} to {gitignore}")
         with gitignore.open("a") as f:
             f.write(("" if newfile else "\n") + "\n".join(items))
 

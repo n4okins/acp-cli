@@ -78,6 +78,7 @@ class WebService:
 
         logger.info("GET: %s", url)
         self._response = self._session.get(url, *args, **kwargs)  # type: ignore
+        self.wait(0.25)
         if self.response.status_code != HttpStatusCode.OK.value:
             msg = f"Failed to get {url}. Status code: {self.response.status_code}"
             raise self.Exceptions.AccessError(msg)
@@ -126,5 +127,6 @@ class WebService:
 
     def load_session(self, file_path: Path | None = None) -> None:
         file_path = file_path or (self._session_dir / "websession")
-        with file_path.open("rb") as f:
-            self.cookies.update(pickle.load(f))
+        if file_path.exists():
+            with file_path.open("rb") as f:
+                self.cookies.update(pickle.load(f))

@@ -1,4 +1,6 @@
 import json
+import os
+import getpass
 from logging import getLogger
 from pathlib import Path
 from typing import Any
@@ -42,32 +44,45 @@ class AtCoderProblems(WebService):
                     break
 
         super().__init__(parser, session_dir=session_dir)
+        # print(f"Detected Session directory: {self._session_dir}")
         self.problems_metadata: dict[str, AtCoderProblemsMetadata] = {}
 
-    def login_atcoder(self, root_dir: Path) -> AtCoder:
+    def login_atcoder(self, root_dir: Path, retry_count: int = 3) -> AtCoder:
         """
         AtCoderにログインする
         """
         atcoder_client = AtCoder(session_dir=self._session_dir)
-
         if atcoder_client.is_logged_in:
             return atcoder_client
 
-        try:
-            env = load_env(root_dir / ".env")
-        except FileNotFoundError:
-            raise self.AtCoderProblemsExceptions.LoginFailedError(
-                f"Please make .env file at {root_dir / '.env'}"
-            )
-        username = env.get("USERNAME", env.get("ATCODER_USERNAME", None))
-        password = env.get("PASSWORD", env.get("ATCODER_PASSWORD", None))
+        # try:
+        #     env = load_env(root_dir / ".env")
+        # except FileNotFoundError:
+        #     raise self.AtCoderProblemsExceptions.LoginFailedError(
+        #         f"Please make .env file at {root_dir / '.env'}"
+        #     )
+        # username = env.get("USERNAME", env.get("ATCODER_USERNAME", None))
+        # password = env.get("PASSWORD", env.get("ATCODER_PASSWORD", None))
 
-        if not username or not password:
-            raise self.AtCoderProblemsExceptions.LoginFailedError(
-                "Please set (ATCODER_USERNAME | USERNAME) and (ATCODER_PASSWORD | PASSWORD) in .env"
-            )
+        # if not username or not password:
+        #     raise self.AtCoderProblemsExceptions.LoginFailedError(
+        #         "Please set (ATCODER_USERNAME | USERNAME) and (ATCODER_PASSWORD | PASSWORD) in .env"
+        #     )
 
-        atcoder_client.login(username=username, password=password)
+        env = os.environ
+        for _ in range(retry_count):
+            try:
+                username = env.get("ATCODER_USERNAME", input("AtCoder Username: "))
+                password = env.get("ATCODER_PASSWORD", getpass.getpass("AtCoder Password: "))
+                atcoder_client.login(username=username, password=password)
+
+            except atcoder_client.Exceptions.LoginFailedError:
+                self.wait(2)
+                print("Failed to login. Please try again.")
+            
+            if atcoder_client.is_logged_in:
+                break
+
         return atcoder_client
 
     def write_cache(

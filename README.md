@@ -1,6 +1,21 @@
 # acp-cli (AtCoder Problems Command Line Interface)
 
 A command line interface for AtCoder Problems.
+AtCoder Problems, およびAtCoderの問題をダウンロード・テスト・提出するためのコマンドラインインターフェースです。
+
+
+## 免責事項
+このツールはAtCoder社とは一切関係ありません。AtCoder社の公式なツールではありません。
+
+このツールを使用することによるいかなる損害についても、作者は一切の責任を負いません。
+
+特に`.acp`ディレクトリには、AtCoderのセッション情報が保存されます。
+
+この情報は他人に知られないように管理してください。GitHubなどにアップロードしないように注意してください。（簡易的な対策として、自動で`.gitignore`に追加されるようにはなっていますが、十分に注意してください。）
+
+また、`acp s`コマンドを使用する際には、作成したコードが自動的にAtCoderに提出されます。
+
+個人情報等を記入していないことなどを確認し、十分に理解した上で使用してください。
 
 # Installation
 ```bash
@@ -11,17 +26,17 @@ $ rye install acp --git=https://github.com/n4okins/acp-cli.git
 ```
 
 # Usage
-### まず、AtCoderのユーザ名とパスワードを記載した.envファイルを作成してください。
+## セッションフォルダ`.acp`が見つからなかった場合、AtCoderからのダウンロード時にログインが必要です。
 ```bash
-$ echo "ATCODER_USERNAME=<your_atcoder_username>" >> .env
-$ echo "ATCODER_PASSWORD=<your_atcoder_password>" >> .env
+$ acp d https://atcoder.jp/contests/typical90/tasks/typical90_a
+AtCoder Username: <Your AtCoder UserName>
+AtCoder Password: <Your AtCoder Password>
 ```
-ディレクトリをgit管理している場合は`.gitignore`に`.env`を追加することを忘れないでください。
-```bash
-$ cat .env
-ATCODER_USERNAME=<UserName>
-ATCODER_PASSWORD=<Password>
-```
+
+ログインに成功すると、カレントディレクトリ以下の`./.acp/atcoder.jp.session`にログイン情報が保存されます。
+
+またカレントディレクトリ、または親ディレクトリを遡って見つけた`.gitignore`に`.acp`を自動で追加しますが、念の為追加されていることを確認してください。
+
 
 # Commands
 ## Download virtual contest
