@@ -26,7 +26,7 @@ $ rye install acp --git=https://github.com/n4okins/acp-cli.git
 ```
 
 # Usage
-## セッションフォルダ`.acp`が見つからなかった場合、AtCoderからのダウンロード時にログインが必要です。
+## セッションが保存されていない場合、AtCoderからのダウンロード時にログインが必要です。
 ```bash
 $ acp d https://atcoder.jp/contests/typical90/tasks/typical90_a
 AtCoder Username: <Your AtCoder UserName>
@@ -36,6 +36,9 @@ AtCoder Password: <Your AtCoder Password>
 ログインに成功すると、`.acp/atcoder.jp.session`にログイン情報が保存されます。
 
 カレントディレクトリ、または親ディレクトリを遡って見つけた`.gitignore`に`.acp`を自動で追加しますが、念の為にユーザー側でも追加されていることを確認してください。
+
+なお、.envファイル等を用いて環境変数に`ATCODER_USERNAME`と`ATCODER_PASSWORD`を追加している場合は自動でログインすることができます。
+
 
 
 # Commands
