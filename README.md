@@ -33,9 +33,9 @@ AtCoder Username: <Your AtCoder UserName>
 AtCoder Password: <Your AtCoder Password>
 ```
 
-ログインに成功すると、カレントディレクトリ以下の`./.acp/atcoder.jp.session`にログイン情報が保存されます。
+ログインに成功すると、`.acp/atcoder.jp.session`にログイン情報が保存されます。
 
-またカレントディレクトリ、または親ディレクトリを遡って見つけた`.gitignore`に`.acp`を自動で追加しますが、念の為追加されていることを確認してください。
+カレントディレクトリ、または親ディレクトリを遡って見つけた`.gitignore`に`.acp`を自動で追加しますが、念の為にユーザー側でも追加されていることを確認してください。
 
 
 # Commands
