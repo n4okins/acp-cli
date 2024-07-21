@@ -22,7 +22,7 @@ AtCoder Problems, およびAtCoderの問題をダウンロード・テスト・�
 $ pip install git+https://github.com/n4okins/acp-cli.git
 ```
 ```bash
-$ rye install acp --git=https://github.com/n4okins/acp-cli.git
+$ rye install acp-cli --git=https://github.com/n4okins/acp-cli.git
 ```
 
 # Usage
