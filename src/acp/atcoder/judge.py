@@ -77,16 +77,16 @@ class JudgeRunner:
             (stdout.decode(), stderr.decode()),
         )
 
-    def check(self, output_testcase_file: Path, answer: str) -> bool:
+    def check(self, output_testcase: str, answer: str) -> bool:
         """
         Args:
-            output_testcase_file (Path): テストケース
+            output_testcase (str): テストケース
             answer (str): 自分の答え
 
         Returns:
             bool: 正解かどうか (True: 正解, False: 不正解)
         """
-        return output_testcase_file.read_text() == answer
+        return output_testcase == answer
 
     def __call__(
         self,
@@ -106,6 +106,8 @@ class JudgeRunner:
         """
         start = time.perf_counter()
         answer, return_code, (stdout, stderr) = self.run(input_testcase_file)
+        answer = answer.strip().rstrip()
+        true_output = output_testcase_file.read_text().strip().rstrip()
         t = time.perf_counter() - start
         logger.debug("Time: %f", t)
 
@@ -115,7 +117,7 @@ class JudgeRunner:
             code = JudgeResult.RE
         elif t > timelimit:
             code = JudgeResult.TLE
-        elif not self.check(output_testcase_file, answer):
+        elif not self.check(true_output, answer):
             code = JudgeResult.WA
         else:
             code = JudgeResult.AC

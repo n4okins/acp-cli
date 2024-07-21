@@ -529,21 +529,20 @@ class AtCoder(WebService):
                 + reset_color()
             )
             if code == JudgeResult.AC:
-                line += f"  time: {meta['time']:.2f} [sec]"
+                line += f"        time: {meta['time']:.2f} [sec]"
             elif code == JudgeResult.WA:
                 out = (target_dir / "out" / f"sample-{i}.out").read_text().strip()
                 line += (
-                    bg_color(32, 64, 32)
-                    + color(255, 255, 255)
+                    color(255, 255, 255)
+                    + bg_color(32, 64, 32)
                     + "\nExpected:\n"
                     + out
                     + reset_color()
-                    + bg_color(64, 32, 32)
                     + color(255, 255, 255)
+                    + bg_color(64, 32, 32)
                     + "\nGot:\n"
-                    + meta["stdout"].strip()
+                    + meta["answer"]
                     + reset_color()
-                    + "\n"
                 )
             elif code == JudgeResult.RE:
                 err = meta["stderr"].strip()
@@ -553,7 +552,7 @@ class AtCoder(WebService):
             elif code == JudgeResult.TLE:
                 line += (
                     bg_color(32, 32, 64)
-                    + f" time: {meta['time']:.2f} sec"
+                    + f"        time: {meta['time']:.2f} sec"
                     + reset_color()
                 )
             lines.append(line)
